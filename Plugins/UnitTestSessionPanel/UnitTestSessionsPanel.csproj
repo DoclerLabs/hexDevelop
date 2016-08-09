@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{73292672-4278-4CDE-BBF1-A497A35B040B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnitTestSessionsPanel</RootNamespace>
+    <AssemblyName>UnitTestSessionsPanel</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\FlashDevelop\Bin\Debug\Plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\FlashDevelop\Bin\Debug\Plugins\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aga">
+      <HintPath>..\..\..\FlashDevelop\Bin\Debug\Aga.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net35\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
+    <Reference Include="websocket-sharp, Version=1.0.2.36589, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\WebSocketSharp.1.0.3-rc9\lib\websocket-sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\TestResultPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TestResultPanel.Designer.cs">
+      <DependentUpon>TestResultPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToolStripSplitButtonEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Handlers\MessageHandlers\HexUnit\HexUnitWebSocketHandler.cs" />
+    <Compile Include="Helpers\ScintillaHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Handlers\ProcessEventHandler.cs" />
+    <Compile Include="Handlers\MessageHandlers\FlexUnit\FlexUnitMessageHandler.cs" />
+    <Compile Include="Handlers\MessageHandlers\ITraceMessageHandler.cs" />
+    <Compile Include="Handlers\MessageHandlers\TraceHandler.cs" />
+    <Compile Include="Localization\en_US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>en_US.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Localization\LocalizationHelper.cs" />
+    <Compile Include="PluginMain.cs" />
+    <Compile Include="Controls\CustomProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Runners\HexUnit\HexUnitRunner.cs" />
+    <Compile Include="TestsExplorerPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestsExplorerPanel.Designer.cs">
+      <DependentUpon>TestsExplorerPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TestsSessionsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestsSessionsPanel.Designer.cs">
+      <DependentUpon>TestsSessionsPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="Model\TestGroupNode.cs" />
+    <Compile Include="TestInformation.cs" />
+    <Compile Include="Model\TestNode.cs" />
+    <Compile Include="Model\TestNodeBase.cs" />
+    <Compile Include="Model\TestTreeModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\TestResultPanel.resx">
+      <DependentUpon>TestResultPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localization\en_US.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>en_US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestsExplorerPanel.resx">
+      <DependentUpon>TestsExplorerPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestsSessionsPanel.resx">
+      <DependentUpon>TestsSessionsPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\PluginCore\PluginCore.csproj">
+      <Project>{61885f70-b4dc-4b44-852d-5d6d03f2a734}</Project>
+      <Name>PluginCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ASCompletion\ASCompletion.csproj">
+      <Project>{4EBF2653-9654-4E40-880E-0046B3D6210E}</Project>
+      <Name>ASCompletion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectManager\ProjectManager.csproj">
+      <Project>{78101c01-e186-4954-b1dd-debb7905fad8}</Project>
+      <Name>ProjectManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
