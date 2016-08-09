@@ -62,22 +62,17 @@
       <Name>PluginCore</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\ASCompletion\ASCompletion.csproj">
+    <ProjectReference Include="..\..\..\External\Plugins\ASCompletion\ASCompletion.csproj">
       <Project>{4ebf2653-9654-4e40-880e-0046b3d6210e}</Project>
       <Name>ASCompletion</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\OutputPanel\OutputPanel.csproj">
-      <Project>{ef8ee44c-62b2-4744-85cb-278e1f37d418}</Project>
-      <Name>OutputPanel</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ProjectManager\ProjectManager.csproj">
+    <ProjectReference Include="..\..\..\External\Plugins\ProjectManager\ProjectManager.csproj">
       <Project>{78101c01-e186-4954-b1dd-debb7905fad8}</Project>
       <Name>ProjectManager</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\XMLCompletion\XMLCompletion.csproj">
+    <ProjectReference Include="..\..\..\External\Plugins\XMLCompletion\XMLCompletion.csproj">
       <Project>{556f43a0-c288-471a-8cd8-a787fc7aca34}</Project>
       <Name>XMLCompletion</Name>
       <Private>False</Private>

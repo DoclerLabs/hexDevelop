@@ -36,6 +36,7 @@ class ReferenceMacro
 			
 			if (!result) printError ("Type not found: " + name);
 		}
+		Sys.exit (0);
 	}
 	
 	/**
@@ -46,6 +47,7 @@ class ReferenceMacro
 	{
 		var path = Context.resolvePath (file);
 		printFile (path);
+		Sys.exit (0);
 	}
 	
 	/**
@@ -103,6 +105,7 @@ class ReferenceMacro
 		});
 		
 		printCompletion (list, "getCompletion " + code);
+		Sys.exit (0);
 	}
 	
 	/**
