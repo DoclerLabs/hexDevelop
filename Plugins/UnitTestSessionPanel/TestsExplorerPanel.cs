@@ -88,6 +88,7 @@ namespace UnitTestSessionsPanel
 
             model = new TestTreeModel {TestSessionModel = sessionTests};
             testsTreeView.Model = new SortedTreeModel(model);
+            testsTreeView.SelectionMode = TreeSelectionMode.Multi; //test
 
             imageList = new ImageList
             {
@@ -280,16 +281,15 @@ namespace UnitTestSessionsPanel
 
         private void RunToolButton_Click(object sender, EventArgs e)
         {
-            if (testsTreeView.SelectedNode == null) return;
+            if (testsTreeView.SelectedNodes == null || testsTreeView.SelectedNodes.Count == 0) return;
 
-            var selected = testsTreeView.SelectedNode.Tag as TestNode;
-
-            if (selected == null) return;
-            
             var hexUnitRunner = new HexUnitRunner();
-            var inFile = new ASCompletion.Model.FileModel();
-            hexUnitRunner.Run(new ASCompletion.Model.MemberModel {Name = selected.TestInformation.FunctionName},
-                new ASCompletion.Model.ClassModel {Name = selected.TestInformation.ClassName, InFile = inFile});
+            foreach (TreeNodeAdv node in testsTreeView.SelectedNodes)
+            {
+                AddRunNode(hexUnitRunner, node);
+            }
+            hexUnitRunner.Run();
+            
         }
 
         private void RefreshToolButton_Click(object sender, EventArgs e)
@@ -328,6 +328,28 @@ namespace UnitTestSessionsPanel
                 }
             }
             this.testsTreeView.EndUpdate();
+        }
+
+        private static void AddRunNode(HexUnitRunner runner, TreeNodeAdv node)
+        {
+            var selected = node.Tag as TestNode;
+            //var group = node.Tag as TestGroupNode;
+
+            if (selected != null)
+            {
+                var inFile = new ASCompletion.Model.FileModel();
+                runner.AddTest(new ASCompletion.Model.MemberModel { Name = selected.TestInformation.FunctionName },
+                    new ASCompletion.Model.ClassModel { Name = selected.TestInformation.ClassName, InFile = inFile });
+
+            }
+            else
+            {
+                foreach (var child in node.Children)
+                {
+                    AddRunNode(runner, child);
+                }
+
+            }
         }
     }
 }

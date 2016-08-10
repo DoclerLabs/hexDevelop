@@ -28,6 +28,7 @@ namespace UnitTestSessionsPanel
         private IEventHandler processHandler;
         private IEventHandler traceHandler;
         private Handlers.MessageHandlers.HexUnit.HexUnitWebSocketHandler hexUnitHandler;
+        private Handlers.MessageHandlers.HexUnit.HexUnitSocketHandler hexUnitHandler2;
 
         private string pluginDesc = "FlashDevelop Plugin for Unit Testing for Haxe and AS3";
 
@@ -109,6 +110,7 @@ namespace UnitTestSessionsPanel
         public void Dispose()
         {
             SaveSettings();
+            hexUnitHandler2.Stop();
         }
 
         /// <summary>
@@ -141,6 +143,18 @@ namespace UnitTestSessionsPanel
                     }
                 }
             }
+
+            switch (e.Type)
+            {
+                case EventType.Command:
+                    var de = e as DataEvent;
+                    if (de != null && de.Action == ProjectManager.ProjectManagerEvents.BuildComplete)
+                    {
+                        MessageBox.Show("test");
+                    }
+                    break;
+            }
+            //runner.HandleEvent()
         }
 
         #endregion
@@ -190,6 +204,7 @@ namespace UnitTestSessionsPanel
             processHandler = new ProcessEventHandler(sessionsPanel);
             //traceHandler = new TraceHandler(ui);
             hexUnitHandler = new Handlers.MessageHandlers.HexUnit.HexUnitWebSocketHandler(sessionsPanel);
+            hexUnitHandler2 = new Handlers.MessageHandlers.HexUnit.HexUnitSocketHandler(sessionsPanel);
         }
 
         /// <summary>

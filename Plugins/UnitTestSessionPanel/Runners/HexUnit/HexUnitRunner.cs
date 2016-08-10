@@ -7,6 +7,7 @@ using PluginCore.Managers;
 using ProjectManager;
 using ProjectManager.Projects.Haxe;
 using ProjectManager.Projects;
+using System.Collections.Generic;
 
 namespace UnitTestSessionsPanel.Runners.HexUnit
 {
@@ -15,6 +16,8 @@ namespace UnitTestSessionsPanel.Runners.HexUnit
         private static string PREVIOUS_TEST_CLASS;
 
         private string origDocumentPath;
+
+        private List<string> testList = new List<string>();
 
         private string tempDocumentClass = "src/TestMainTmp.hx";
 
@@ -28,26 +31,41 @@ class TestMainTmp
         var emu : hex.unittest.runner.ExMachinaUnitCore = new hex.unittest.runner.ExMachinaUnitCore();
         
         #if js
-            js.Browser.document.getElementById('console').style.display = 'block';
-            emu.addListener( new hex.unittest.notifier.BrowserUnitTestNotifier('console') );
+            //js.Browser.document.getElementById('console').style.display = 'block';
+            //emu.addListener( new hex.unittest.notifier.BrowserUnitTestNotifier('console') );
             emu.addListener( new hex.unittest.notifier.WebSocketNotifier('ws://localhost:6660') );
         #elseif flash
             emu.addListener( new hex.unittest.notifier.FlashUnitTestNotifier(flash.Lib.current) );
+        #elseif sys
+            emu.addListener( new hex.unittest.notifier.SocketNotifier('localhost', 6661) );
         #end
         
-        emu.$(testToRun);
+        $(testsToRun)
         emu.run();
     }	
 }";
 
+        private string runnerPrefix = "emu.";
 
-        public void Run(MemberModel testMember, ClassModel ownerClass)
+        public void AddTest(MemberModel testMember, ClassModel ownerClass)
+        {
+            string testToRun = testMember != null
+                                ? runnerPrefix + "addTestMethod(" + ownerClass.QualifiedName + ", \"" + testMember.Name + "\");"
+                                : runnerPrefix + "addTest(" + ownerClass.QualifiedName + ");";
+
+            if (!testList.Contains(testToRun))
+            {
+                testList.Add(testToRun);
+            }
+        }
+
+        public void Run()
         {
             this.NotifyTestStart();
 
             HaxeProject project = (HaxeProject)PluginBase.CurrentProject;
 
-            this.GenerateDocumentClassFromTemplate(testMember, ownerClass);
+            this.GenerateDocumentClassFromTemplate();
 
             this.StoreOrigDocumentClass(project);
 
@@ -69,14 +87,14 @@ class TestMainTmp
             TraceManager.Add("Running unit test for " + this.GetTestToRun());
         }
 
-        private void GenerateDocumentClassFromTemplate(MemberModel testMember, ClassModel ownerClass)
+        private void GenerateDocumentClassFromTemplate()
         {
-            string testToRun = testMember != null 
-                                ? "addTestMethod(" + ownerClass.QualifiedName + ", \"" + testMember.Name + "\")"
-                                : "addTest(" + ownerClass.QualifiedName + ")";
-
             string text = this.testDocumentTemplate;
-            text = text.Replace("$(testToRun)", testToRun);
+
+            var tests = string.Join("\n", testList.ToArray());
+
+            
+            text = text.Replace("$(testsToRun)", tests);
             File.WriteAllText(this.tempDocumentClass, text);
         }
 
@@ -143,21 +161,21 @@ class TestMainTmp
             File.Delete(this.tempDocumentClass);
         }
 
-        /*public void HandleEvent(Object sender, NotifyEvent e, HandlingPriority priority)
+        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
         {
             switch (e.Type)
             {
                 case EventType.Command:
                 {
-                    DataEvent de = (DataEvent)e;
-                    if (de.Action == "ProjectManager.BuildComplete") 
+                    var de = e as DataEvent;
+                    if (de != null && de.Action == ProjectManagerEvents.BuildComplete) 
                     {
                         TraceManager.Add("HELLOOOO");
                     }
                     break;
                 }
             }
-        }*/
+        }
     }
 }
 
