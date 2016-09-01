@@ -37,7 +37,7 @@ class TestMainTmp
         #elseif flash
             emu.addListener( new hex.unittest.notifier.FlashUnitTestNotifier(flash.Lib.current) );
         #elseif sys
-            emu.addListener( new hex.unittest.notifier.SocketNotifier('localhost', 6661) );
+            emu.addListener( new hex.unittest.notifier.SocketNotifier('localhost', 6662) );
         #end
         
         $(testsToRun)

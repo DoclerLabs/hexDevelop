@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using ASCompletion.Context;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using WebSocketSharp;
 using WebSocketSharp.Server;
-using System.Windows.Forms;
 
 namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
 {
@@ -57,7 +51,7 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                 {
                     if (pluginUi.InvokeRequired)
                     {
-                        pluginUi.Invoke((MethodInvoker)delegate
+                        pluginUi.Invoke((Action) delegate
                         {
                             pluginUi.AddTest(info);
                             pluginUi.EndUpdate();

@@ -1,76 +1,124 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
 {
+
+    class StateObj
+    {
+        public Socket Client;
+        public const int BufferSize = 256;
+        public byte[] Buffer = new byte[BufferSize];
+        public List<byte> Data = new List<byte>();
+    }
+
     class HexUnitSocketHandler
     {
         private HexUnitHelper helper;
         private TestsSessionsPanel pluginUI;
 
-        private TcpListener server;
-        private Thread listenerThread;
+        //private Thread listenerThread;
+        private ManualResetEvent done;
+        private TcpListener listener;
 
         public HexUnitSocketHandler(TestsSessionsPanel ui)
         {
             helper = new HexUnitHelper();
             pluginUI = ui;
-            server = new TcpListener(IPAddress.Any, 6661);
 
-            listenerThread = new Thread(listen);
-            listenerThread.Start();
+            done = new ManualResetEvent(false);
+            //listenerThread = new Thread(Listen);
+            //listenerThread.IsBackground = true;
+            //listenerThread.Start();
+            Listen();
         }
 
-        public void Stop()
+        private void Listen()
         {
-            server.Stop();
-        }
-
-        private void listen()
-        {
+            listener = new TcpListener(IPAddress.Any, 6662);
             try
             {
-                server.Start();
-            }
-            catch (SocketException e)
-            {
-                MessageBox.Show(e.ToString(), "Error starting hexUnit server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-                //PluginCore.Managers.ErrorManager.ShowError("Could not start hexUnit server", e); //does not work
-            }
+                listener.Start();
 
-            try
-            {
-                while (true)
-                {
-                    TcpClient client = server.AcceptTcpClient();
-
-                    using (var stream = new StreamReader(client.GetStream()))
-                    {
-                        try
-                        {
-                            while (!stream.EndOfStream)
-                            {
-                                var line = stream.ReadLine();
-                                parseMessage(line);
-                            }
-                        }
-                        catch { }
-                    }
-                }
+                done.Reset();
+                
+                listener.BeginAcceptSocket (AcceptCallback, listener);
             }
             catch
             {
             }
-            
-            
-            
         }
 
-        private void parseMessage(string msg)
+        private void AcceptCallback(IAsyncResult r)
+        {
+            done.Set();
+
+            var listener = (TcpListener)r.AsyncState;
+            var handler = listener.EndAcceptSocket(r);
+
+            var state = new StateObj();
+            state.Client = handler;
+
+            handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, ReadCallback, state);
+        }
+
+        private void ReadCallback(IAsyncResult r)
+        {
+            var state = (StateObj)r.AsyncState;
+            var handler = state.Client;
+
+            try
+            {
+                int bytesLen = handler.EndReceive(r);
+
+                if (bytesLen > 0)
+                {
+                    var array = new byte[bytesLen];
+                    Buffer.BlockCopy(state.Buffer, 0, array, 0, bytesLen);
+                    state.Data.AddRange(array);
+
+                    var size = state.Data[0];
+
+                    while (state.Data.Count >= size + 1)
+                    {
+                        var encoding = new UTF8Encoding(false);
+                        var message = encoding.GetString(state.Data.ToArray(), 1, size);
+                        state.Data.RemoveRange(0, size);
+                        
+                        ParseMessage(message);
+                    }
+
+                    handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, new AsyncCallback(ReadCallback), state);
+                }
+                else
+                {
+                    handler.Shutdown(SocketShutdown.Both);
+                    handler.Close();
+
+                    done.Reset();
+                    listener.BeginAcceptSocket(AcceptCallback, listener);
+                }
+            }
+            catch (SocketException e) //thrown after first message was received, why?
+            {
+                handler.Close();
+                listener.BeginAcceptSocket(AcceptCallback, listener);
+            }
+            catch (Exception e)
+            {
+                //handler.Shutdown(SocketShutdown.Both);
+                //handler.Close();
+                handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, new AsyncCallback(ReadCallback), state);
+                //listener.BeginAcceptSocket(AcceptCallback, listener);
+            }
+        }
+
+        private void ParseMessage(string msg)
         {
             ThreadPool.QueueUserWorkItem(delegate
             {
@@ -79,7 +127,7 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                 {
                     if (pluginUI.InvokeRequired)
                     {
-                        pluginUI.Invoke((MethodInvoker)delegate
+                        pluginUI.Invoke((Action) delegate
                         {
                             pluginUI.AddTest(info);
                             pluginUI.EndUpdate();

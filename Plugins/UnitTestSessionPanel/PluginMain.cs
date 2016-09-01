@@ -110,7 +110,6 @@ namespace UnitTestSessionsPanel
         public void Dispose()
         {
             SaveSettings();
-            hexUnitHandler2.Stop();
         }
 
         /// <summary>

@@ -1,14 +1,11 @@
 ﻿
 using System;
 using PluginCore;
-using WeifenLuo.WinFormsUI.Docking;
-using System.Drawing;
 using System.ComponentModel;
 using PluginCore.Managers;
 using PluginCore.Utilities;
 using System.IO;
 using PluginCore.Helpers;
-using ProjectManager;
 using PluginCore.Controls;
 using ScintillaNet;
 using System.Windows.Forms;

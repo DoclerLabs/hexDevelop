@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-
-namespace DSLCompletion
+﻿namespace DSLCompletion
 {
     /**
      * TODO: finish
