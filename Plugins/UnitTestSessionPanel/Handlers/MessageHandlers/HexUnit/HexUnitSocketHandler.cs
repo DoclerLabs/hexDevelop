@@ -15,7 +15,7 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
         public TcpClient Client;
         public const int BufferSize = 512;
         public byte[] Buffer = new byte[BufferSize];
-        public List<byte> Data = new List<byte>();
+        public MemoryStream Data = new MemoryStream(BufferSize);
     }
 
     class HexUnitSocketHandler
@@ -86,23 +86,24 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
 
                 if (bytesLen > 0)
                 {
-                    var array = new byte[bytesLen];
-                    Buffer.BlockCopy(state.Buffer, 0, array, 0, bytesLen);
-                    state.Data.AddRange(array);
+                    state.Data.Write(state.Buffer, 0, bytesLen);
 
                     while (bytesLen >= StateObj.BufferSize && client.GetStream().DataAvailable)
                     {
-                        bytesLen = client.GetStream().Read(array, 0, bytesLen);
-                        Array.Resize(ref array, bytesLen);
-                        state.Data.AddRange(array);
+                        bytesLen = client.GetStream().Read(state.Buffer, 0, bytesLen);
+                        state.Data.Write(state.Buffer, 0, bytesLen);
                     }
 
                     int size;
-                    while (state.Data.Count > 4 && state.Data.Count >= (size = BitConverter.ToInt32(state.Data.ToArray(), 0)) + 4)
+                    while (state.Data.Length > 4 && state.Data.Length >= (size = BitConverter.ToInt32(state.Data.ToArray(), 0)) + 4)
                     {
                         //TODO: Extract 
                         var message = encoding.GetString(state.Data.ToArray(), 4, size);
-                        state.Data.RemoveRange(0, size + 4);
+                        //state.Data.RemoveRange(0, size + 4);
+                        var buf = state.Data.GetBuffer();
+                        var newLen = state.Data.Length - (size + 4);
+                        Buffer.BlockCopy(buf, size + 4, buf, 0, (int)newLen);
+                        state.Data.SetLength(newLen);
 
                         try
                         {
@@ -110,7 +111,7 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                         }
                         catch (Exception e)
                         {
-                            //Maybe we should clear state.Data, although I'm not a big fan of this List stuff in its current state
+                            //Maybe we should clear state.Data
                         }
                     }
 
@@ -120,14 +121,14 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                 {
                     client.Close();
                     // Not really sure we shouldn't accept new clients at any time...
-                    listener.BeginAcceptSocket(AcceptCallback, listener);
+                    listener.BeginAcceptTcpClient(AcceptCallback, listener);
                 }
             }
             catch (Exception e)
             {
                 client.Close();
                 // Not really sure we shouldn't accept new clients at any time...
-                listener.BeginAcceptSocket(AcceptCallback, listener);
+                listener.BeginAcceptTcpClient(AcceptCallback, listener);
             }
         }
 
@@ -149,7 +150,6 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                             }
                             catch
                             {
-                                
                             }
                             pluginUI.EndUpdate();
                         });
