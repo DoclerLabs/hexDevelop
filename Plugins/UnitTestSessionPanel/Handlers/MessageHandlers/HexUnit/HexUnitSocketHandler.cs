@@ -44,6 +44,7 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
             catch
             {
                 //TODO: Port maybe already in use
+                return;
             }
 
             try
