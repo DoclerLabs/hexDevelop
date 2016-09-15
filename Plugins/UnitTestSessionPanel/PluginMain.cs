@@ -9,7 +9,6 @@ using PluginCore.Localization;
 using PluginCore.Managers;
 using PluginCore.Utilities;
 using UnitTestSessionsPanel.Handlers;
-using UnitTestSessionsPanel.Handlers.MessageHandlers;
 using UnitTestSessionsPanel.Localization;
 using WeifenLuo.WinFormsUI.Docking;
 

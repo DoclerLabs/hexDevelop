@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -11,8 +12,8 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
 
     class StateObj
     {
-        public Socket Client;
-        public const int BufferSize = 256;
+        public TcpClient Client;
+        public const int BufferSize = 512;
         public byte[] Buffer = new byte[BufferSize];
         public List<byte> Data = new List<byte>();
     }
@@ -22,19 +23,14 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
         private HexUnitHelper helper;
         private TestsSessionsPanel pluginUI;
 
-        //private Thread listenerThread;
-        private ManualResetEvent done;
         private TcpListener listener;
+        private UTF8Encoding encoding = new UTF8Encoding(false);
 
         public HexUnitSocketHandler(TestsSessionsPanel ui)
         {
             helper = new HexUnitHelper();
             pluginUI = ui;
 
-            done = new ManualResetEvent(false);
-            //listenerThread = new Thread(Listen);
-            //listenerThread.IsBackground = true;
-            //listenerThread.Start();
             Listen();
         }
 
@@ -44,37 +40,49 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
             try
             {
                 listener.Start();
-
-                done.Reset();
-                
-                listener.BeginAcceptSocket (AcceptCallback, listener);
             }
             catch
             {
+                //TODO: Port maybe already in use
+            }
+
+            try
+            {
+                listener.BeginAcceptTcpClient(AcceptCallback, listener);
+            }
+            catch
+            {
+                //TODO: Accept again
             }
         }
 
         private void AcceptCallback(IAsyncResult r)
         {
-            done.Set();
-
             var listener = (TcpListener)r.AsyncState;
-            var handler = listener.EndAcceptSocket(r);
+            var client = listener.EndAcceptTcpClient(r);
 
             var state = new StateObj();
-            state.Client = handler;
+            state.Client = client;
 
-            handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, ReadCallback, state);
+            try
+            {
+                client.GetStream().BeginRead(state.Buffer, 0, StateObj.BufferSize, ReadCallback, state);
+            }
+            catch
+            {
+                client.Close();
+                listener.BeginAcceptTcpClient(AcceptCallback, listener);
+            }
         }
 
         private void ReadCallback(IAsyncResult r)
         {
             var state = (StateObj)r.AsyncState;
-            var handler = state.Client;
+            var client = state.Client;
 
             try
             {
-                int bytesLen = handler.EndReceive(r);
+                int bytesLen = client.GetStream().EndRead(r);
 
                 if (bytesLen > 0)
                 {
@@ -82,39 +90,44 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                     Buffer.BlockCopy(state.Buffer, 0, array, 0, bytesLen);
                     state.Data.AddRange(array);
 
-                    var size = state.Data[0];
-
-                    while (state.Data.Count >= size + 1)
+                    while (bytesLen >= StateObj.BufferSize && client.GetStream().DataAvailable)
                     {
-                        var encoding = new UTF8Encoding(false);
-                        var message = encoding.GetString(state.Data.ToArray(), 1, size);
-                        state.Data.RemoveRange(0, size);
-                        
-                        ParseMessage(message);
+                        bytesLen = client.GetStream().Read(array, 0, bytesLen);
+                        Array.Resize(ref array, bytesLen);
+                        state.Data.AddRange(array);
                     }
 
-                    handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, new AsyncCallback(ReadCallback), state);
+                    int size;
+                    while (state.Data.Count > 4 && state.Data.Count >= (size = BitConverter.ToInt32(state.Data.ToArray(), 0)) + 4)
+                    {
+                        //TODO: Extract 
+                        var message = encoding.GetString(state.Data.ToArray(), 4, size);
+                        state.Data.RemoveRange(0, size + 4);
+
+                        try
+                        {
+                            ParseMessage(message);
+                        }
+                        catch (Exception e)
+                        {
+                            //Maybe we should clear state.Data, although I'm not a big fan of this List stuff in its current state
+                        }
+                    }
+
+                    client.GetStream().BeginRead(state.Buffer, 0, StateObj.BufferSize, ReadCallback, state);
                 }
                 else
                 {
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
-
-                    done.Reset();
+                    client.Close();
+                    // Not really sure we shouldn't accept new clients at any time...
                     listener.BeginAcceptSocket(AcceptCallback, listener);
                 }
             }
-            catch (SocketException e) //thrown after first message was received, why?
-            {
-                handler.Close();
-                listener.BeginAcceptSocket(AcceptCallback, listener);
-            }
             catch (Exception e)
             {
-                //handler.Shutdown(SocketShutdown.Both);
-                //handler.Close();
-                handler.BeginReceive(state.Buffer, 0, StateObj.BufferSize, SocketFlags.None, new AsyncCallback(ReadCallback), state);
-                //listener.BeginAcceptSocket(AcceptCallback, listener);
+                client.Close();
+                // Not really sure we shouldn't accept new clients at any time...
+                listener.BeginAcceptSocket(AcceptCallback, listener);
             }
         }
 
@@ -125,11 +138,19 @@ namespace UnitTestSessionsPanel.Handlers.MessageHandlers.HexUnit
                 var info = helper.ParseMessage(msg);
                 if (info != null)
                 {
+                    // TODO: Invoke check inside the pluginui
                     if (pluginUI.InvokeRequired)
                     {
                         pluginUI.Invoke((Action) delegate
                         {
-                            pluginUI.AddTest(info);
+                            try
+                            {
+                                pluginUI.AddTest(info);
+                            }
+                            catch
+                            {
+                                
+                            }
                             pluginUI.EndUpdate();
                         });
                     }
