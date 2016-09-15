@@ -150,6 +150,7 @@ namespace DSLCompletion
 
         private bool OpenFile(string file)
         {
+            file = file.TrimStart('/', '\\');
             var result = completionHandler.GetFile(file);
             if (result == null) return false;
 

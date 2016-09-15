@@ -80,8 +80,10 @@ namespace DSLCompletion
             {
                 process.Start();
                 var output = process.StandardOutput.ReadToEnd();
-                var error = process.StandardError.ReadToEnd();
+                var error = process.StandardError.ReadToEnd().Trim('\r', '\n');
                 process.Close();
+
+                if (error != "") PluginCore.Managers.TraceManager.Add(error);
 
                 output = output.Replace("\r\n", "\n");
 

@@ -20,7 +20,11 @@ namespace DSLCompletion
 
         public PositionResult GetPosition(string type)
         {
-            return compilerHandler.GetPosition(type);
+            var result = compilerHandler.GetPosition(type);
+
+            if (result != null) return result;
+
+            return fallbackHandler.GetPosition(type);
         }
 
         public List<string> GetCompletion(string path)
