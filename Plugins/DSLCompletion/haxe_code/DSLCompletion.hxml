@@ -9,5 +9,5 @@
 -cp ../../../../../../hexMachina/hexInject/src
 -js bin/Main.js
 -main test.TestClass
---macro util.ReferenceMacro.getCompletion('test.TestClass.')
+--macro util.ReferenceMacro.completePath('TestClass2')
 --times

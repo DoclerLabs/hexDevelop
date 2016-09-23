@@ -33,7 +33,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="test.TestClass" />
     <option enabledebug="False" />
-    <option additional="--macro util.ReferenceMacro.getCompletion('test.TestClass.')&#xA;--times" />
+    <option additional="--macro util.ReferenceMacro.completePath('TestClass2')&#xA;--times" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

@@ -1,14 +1,12 @@
 package util;
+import haxe.macro.Expr.TypeDefinition;
 
 #if macro
 import haxe.io.Path;
 import haxe.macro.Compiler;
 import haxe.macro.Context;
-import haxe.macro.ExampleJSGenerator;
 import haxe.macro.Expr.Position;
-import haxe.macro.JSGenApi;
 import haxe.macro.PositionTools;
-import haxe.macro.TypeTools;
 import haxe.macro.Type;
 import sys.FileSystem;
 
@@ -21,6 +19,41 @@ using StringTools;
  */
 class ReferenceMacro
 {
+	
+	/**
+	 * Prints a list of type paths where a Class, Enum, ... of the given name can be found
+	 */
+	macro public static function completePath (clazz : String) : Void
+	{
+		Context.onGenerate (function (types : Array<Type>) {
+			var list = new Array<String> ();
+			for (type in types) {
+				switch (type) {
+					case TEnum(e, _):
+						var val = e.get ();
+						if (val.name == clazz)
+							list.push (getPackagePath(val));
+					case TInst (c, _):
+						var val = c.get ();
+						if (val.name == clazz)
+							list.push (getPackagePath(val));
+					case TType (t, _):
+						var val = t.get ();
+						if (val.name == clazz)
+							list.push (getPackagePath(val));
+					case TAbstract (a, _):
+						var val = a.get ();
+						if (val.name == clazz)
+							list.push (getPackagePath(val));
+					default:
+				}
+			}
+			printCompletion (list, "completePath " + clazz);
+			
+			Sys.exit (0);
+		});
+	}
+	
 	/**
 	 * Prints the position (file and byte index) for the given input.
 	 * @param	name can be a Class, Enum, TypeDef, Abstract, Function or Var
@@ -137,7 +170,7 @@ class ReferenceMacro
 	{
 		if (clazz == "") return null;
 		
-		var list : Array<Field>;
+		var list = new Array<Field> ();
 		
 		
 		try {
@@ -229,6 +262,11 @@ class ReferenceMacro
 		
 		return false;
 		
+	}
+	
+	static function getPackagePath (type : BaseType) : String
+	{
+		return type.module.endsWith (type.name) ? type.module : type.module + "." + type.name;
 	}
 	
 	static function getPositionObj (type : Type) : PositionObject

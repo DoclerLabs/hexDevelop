@@ -53,14 +53,39 @@ namespace DSLCompletion
 
             ThreadPool.QueueUserWorkItem(delegate
             {
-                var result = completionHandler.GetCompletion(selection);
-                if (result == null || result.Count == 0) return;
-                
-                InvokeSci(delegate
+                completionHandler.GetCompletion(selection, delegate(List<string> list)
                 {
-                    ShowCompletionList(result, word);
+                    if (list == null || list.Count == 0) return;
+
+                    InvokeSci(delegate
+                    {
+                        ShowCompletionList(list, word);
+                    });
                 });
-                
+            });
+            
+            return true;
+        }
+
+        public bool FindClass()
+        {
+            if (!IsFileValid()) return false;
+
+            var clazz = FindSelection(IsAllowedChar);
+            if (clazz.Contains("."))
+                return false;
+
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                completionHandler.GetCompletePath(clazz, delegate (List<string> list)
+                {
+                    if (list == null || list.Count == 0) return;
+
+                    InvokeSci(delegate
+                    {
+                        ShowCompletionList(list, clazz);
+                    });
+                });
             });
 
             return true;
@@ -150,15 +175,17 @@ namespace DSLCompletion
 
         private bool OpenFile(string file)
         {
-            var result = completionHandler.GetFile(file);
-            if (result == null) return false;
-
-            var pos = new PositionResult(result, 0);
-            FixPath(pos);
-
-            InvokeSci(delegate
+            completionHandler.GetFile(file, delegate(string str)
             {
-                GotoPosition(pos);
+                if (str == null) return;
+
+                var pos = new PositionResult(str, 0);
+                FixPath(pos);
+
+                InvokeSci(delegate
+                {
+                    GotoPosition(pos);
+                });
             });
 
             return true;
@@ -189,19 +216,22 @@ namespace DSLCompletion
 
             ThreadPool.QueueUserWorkItem(delegate
             {
-                var result = completionHandler.GetPosition(type);
-                if (result == null)
+                completionHandler.GetPosition(type, delegate (PositionResult pos)
                 {
-                    fail?.Invoke();
-                    return;
-                }
+                    if (pos == null)
+                    {
+                        fail?.Invoke();
+                        return;
+                    }
 
-                FixPath(result);
+                    FixPath(pos);
 
-                InvokeSci(delegate
-                {
-                    GotoPosition(result);
+                    InvokeSci(delegate
+                    {
+                        GotoPosition(pos);
+                    });
                 });
+                
             });
         }
 

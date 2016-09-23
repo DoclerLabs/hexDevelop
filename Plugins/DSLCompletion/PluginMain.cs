@@ -94,6 +94,8 @@ namespace DSLCompletion
             this.completion = new DSLComplete(settingObject.CompletionMethod);
 
             PluginBase.MainForm.RegisterShortcutItem("DSLCompletion.GotoDeclaration", Keys.F12);
+            PluginBase.MainForm.RegisterShortcutItem("DSLCompletion.TriggerCompletion", Keys.Control | Keys.Space);
+            PluginBase.MainForm.RegisterShortcutItem("DSLCompletion.CompletePackage", Keys.Control | Keys.I);
             EventManager.AddEventHandler(this, EventType.Keys | EventType.ApplySettings, HandlingPriority.Normal);
             UITools.Manager.OnCharAdded += new UITools.CharAddedHandler(OnChar);
         }
@@ -110,7 +112,7 @@ namespace DSLCompletion
                 case EventType.Keys:
                     KeyEvent ke = e as KeyEvent;
                     
-                    if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys ("DSLCompletion.GotoDeclaration"))
+                    if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("DSLCompletion.GotoDeclaration"))
                     {
                         if (completion.GotoDeclaration())
                         {
@@ -118,9 +120,17 @@ namespace DSLCompletion
                             ke.ProcessKey = false;
                         }
                     }
-                    else if (ke.Value == (Keys.Control | Keys.Space))
+                    else if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("DSLCompletion.TriggerCompletion"))
                     {
                         if (completion.GetCompletion())
+                        {
+                            ke.Handled = true;
+                            ke.ProcessKey = false;
+                        }
+                    }
+                    else if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("DSLCompletion.CompletePackage"))
+                    {
+                        if (completion.FindClass())
                         {
                             ke.Handled = true;
                             ke.ProcessKey = false;
@@ -162,6 +172,10 @@ namespace DSLCompletion
             {
                 completion.GetCompletion();
             }
+            //if ((char) value == '.')
+            //{
+            //    completion.GetCompletion();
+            //}
         }
     }
 }

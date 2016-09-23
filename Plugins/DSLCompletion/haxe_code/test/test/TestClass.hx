@@ -12,6 +12,7 @@ class TestClass
 	public static function main () : Void
 	{
 		MockStubStatefulService;
+		var v : Test;
 	}
 
 	public function new ()
@@ -47,4 +48,3 @@ enum TestEnum
 {
 	Test1;
 }
-

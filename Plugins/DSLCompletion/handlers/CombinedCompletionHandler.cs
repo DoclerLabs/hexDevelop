@@ -21,23 +21,67 @@ namespace DSLCompletion
             fallbackHandler = new FallbackCompletionHandler();
         }
 
-        public PositionResult GetPosition(string type)
+        public void GetCompletePath(string module, ListCallback callback)
         {
-            return compilerHandler.GetPosition(type);
+            fallbackHandler.GetCompletePath(module, delegate (List<string> list)
+            {
+                if (list != null)
+                {
+                    callback(list);
+                    return;
+                }
+
+                compilerHandler.GetCompletePath(module, callback);
+            });
         }
 
-        public List<string> GetCompletion(string path)
+        public void GetPosition(string type, PositionCallback callback)
         {
-            var result = fallbackHandler.GetCompletion(path);
-
-            if (result != null) return result;
-
-            return compilerHandler.GetCompletion(path);
+            compilerHandler.GetPosition(type, delegate (PositionResult pos)
+            {
+                callback(pos);
+            });
         }
 
-        public string GetFile(string file)
+        public void GetCompletion(string path, ListCallback callback)
         {
-            return fallbackHandler.GetFile(file);
+            fallbackHandler.GetCompletion(path, delegate (List<string> list)
+            {
+                callback(list);
+                compilerHandler.GetCompletion(path, delegate (List<string> compiler)
+                {
+                    if (compiler != null && compiler.Count != 0)
+                    {
+                        foreach (var r in compiler)
+                        {
+                            if (!list.Contains(r))
+                            {
+                                list.Add(r);
+                            }
+                        }
+                        callback(list);
+                    }
+                });
+            });
+
+            //if (result != null) return result;
+            //var compilerResult = compilerHandler.GetCompletion(path);
+
+            //if (compilerResult != null)
+            //{
+            //    foreach (var r in compilerResult)
+            //    {
+            //        if (!result.Contains(r))
+            //        {
+            //            result.Add(r);
+            //        }
+            //    }
+            //}
+        }
+
+        public void GetFile(string file, StringCallback callback)
+        {
+            fallbackHandler.GetFile(file, callback);
         }
     }
 }
