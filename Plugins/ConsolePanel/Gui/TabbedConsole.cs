@@ -9,7 +9,7 @@ namespace ConsolePanel.Gui
         //private List<CmdPanel> consoles;
         private PluginMain main;
 
-        public ICollection<ConsolePanel> Consoles
+        public ICollection<ConsoleControl.ConsoleControl> Consoles
         {
             get
             {
@@ -17,21 +17,21 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public Dictionary<ConsolePanel, TabPage> consoleTabMap;
-        public Dictionary<TabPage, ConsolePanel> tabConsoleMap;
+        public Dictionary<ConsoleControl.ConsoleControl, TabPage> consoleTabMap;
+        public Dictionary<TabPage, ConsoleControl.ConsoleControl> tabConsoleMap;
 
         public TabbedConsole(PluginMain plugin)
         {
             InitializeComponent();
 
             main = plugin;
-            consoleTabMap = new Dictionary<ConsolePanel, TabPage>();
-            tabConsoleMap = new Dictionary<TabPage, ConsolePanel>();
+            consoleTabMap = new Dictionary<ConsoleControl.ConsoleControl, TabPage>();
+            tabConsoleMap = new Dictionary<TabPage, ConsoleControl.ConsoleControl>();
 
             btnNew.Image = PluginCore.PluginBase.MainForm.FindImage16("33");
         }
 
-        public void AddConsole(ConsolePanel console)
+        public void AddConsole(ConsoleControl.ConsoleControl console)
         {
             var tabPage = new TabPage("Console");
             console.Dock = DockStyle.Fill;
@@ -43,7 +43,7 @@ namespace ConsolePanel.Gui
             tabConsoleMap.Add(tabConsoles.SelectedTab, console);
         }
 
-        public void RemoveConsole(ConsolePanel console)
+        public void RemoveConsole(ConsoleControl.ConsoleControl console)
         {
             if (consoleTabMap.ContainsKey(console))
             {

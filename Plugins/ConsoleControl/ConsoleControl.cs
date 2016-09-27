@@ -3,17 +3,19 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Windows.Automation;
 
-namespace ConsolePanel.Gui
+namespace ConsoleControl
 {
-    public partial class ConsolePanel : UserControl
+    public partial class ConsoleControl : UserControl
     {
         Process process;
         IntPtr cmdHandle;
+        AutomationElement window;
         Size realSize;
 
-        Color backColor = Color.Black;
-        Color foreColor = Color.White;
+        ConsoleColor backColor = ConsoleColor.Black;
+        ConsoleColor foreColor = ConsoleColor.White;
         List<string> commandsToDo = new List<string>();
         string lastWorkingDir;
 
@@ -37,7 +39,7 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public Color ConsoleBackColor
+        public ConsoleColor ConsoleBackColor
         {
             get
             {
@@ -62,7 +64,7 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public Color ConsoleForeColor
+        public ConsoleColor ConsoleForeColor
         {
             get
             {
@@ -107,7 +109,12 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public ConsolePanel(bool init = true, string workingDirectory = null)
+        /// <summary>
+        /// Creates a new ConsoleControl
+        /// </summary>
+        /// <param name="init"></param>
+        /// <param name="workingDirectory"></param>
+        public ConsoleControl(bool init = true, string workingDirectory = null)
         {
             InitializeComponent();
 
@@ -152,27 +159,27 @@ namespace ConsolePanel.Gui
                 if (lastWorkingDir != null)
                     process.StartInfo.WorkingDirectory = lastWorkingDir;
                 process.StartInfo.UseShellExecute = false;
-
+                
                 process.EnableRaisingEvents = true;
                 process.Exited += Process_Exited;
 
                 process.Start();
+
+                //Wait for cmd window
+                while (process.MainWindowHandle == IntPtr.Zero)
+                {
+                    process.Refresh();
+                }
+                cmdHandle = process.MainWindowHandle;
+                window = System.Windows.Automation.AutomationElement.FromHandle(cmdHandle);
+                WinApi.SetParent(cmdHandle, pnlClipping.Handle);
+
+                SendString("cls");
+                ResizeConsole();
             }
             catch
             {
             }
-            //Wait for cmd window
-            while (process.MainWindowHandle == IntPtr.Zero)
-            {
-                process.Refresh();
-            }
-            cmdHandle = process.MainWindowHandle;
-
-            WinApi.SetParent(cmdHandle, pnlClipping.Handle);
-
-            SendString("cls");
-
-            ResizeConsole();
         }
 
         /// <summary>
@@ -215,8 +222,6 @@ namespace ConsolePanel.Gui
 
         private void RunCommandWithoutCache(string cmd)
         {
-            System.Windows.Automation.AutomationElement window = System.Windows.Automation.AutomationElement.FromHandle(cmdHandle);
-            
             window.SetFocus();
             //TODO: prevent user from clicking around while doing this
             SendKeys.SendWait(cmd);

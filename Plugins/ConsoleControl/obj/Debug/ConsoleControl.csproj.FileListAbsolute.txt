@@ -1,0 +1,6 @@
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\obj\Debug\ConsoleControl.csproj.GenerateResource.Cache
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\bin\Debug\ConsoleControl.dll
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\bin\Debug\ConsoleControl.pdb
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\obj\Debug\ConsoleControl.dll
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\obj\Debug\ConsoleControl.pdb
+C:\work\Documents\external\flashdevelop\hexDevelop\Plugins\ConsoleControl\obj\Debug\ConsoleControl.ConsoleControl.resources

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ConsolePanel
+namespace ConsoleControl
 {
     [StructLayout(LayoutKind.Sequential)]
     struct RECT

@@ -1,6 +1,6 @@
-﻿namespace ConsolePanel.Gui
+﻿namespace ConsoleControl
 {
-    partial class ConsolePanel
+    partial class ConsoleControl
     {
         /// <summary> 
         /// Required designer variable.
