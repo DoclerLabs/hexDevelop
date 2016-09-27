@@ -33,10 +33,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="UIAutomationClient" />
   </ItemGroup>
   <ItemGroup>
@@ -69,7 +67,7 @@
       <Name>PluginCore</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\ProjectManager\ProjectManager.csproj">
+    <ProjectReference Include="..\..\..\External\Plugins\ProjectManager\ProjectManager.csproj">
       <Project>{78101c01-e186-4954-b1dd-debb7905fad8}</Project>
       <Name>ProjectManager</Name>
       <Private>False</Private>

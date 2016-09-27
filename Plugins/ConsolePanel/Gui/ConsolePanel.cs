@@ -24,8 +24,16 @@ namespace ConsolePanel.Gui
             set
             {
                 lastWorkingDir = value;
-                SendString("cd \"" + value + "\"");
-                SendString("cls");
+
+                if (process == null)
+                {
+                    Create();
+                }
+                else
+                {
+                    SendString("cd \"" + value + "\"");
+                    SendString("cls");
+                }
             }
         }
 
@@ -37,6 +45,9 @@ namespace ConsolePanel.Gui
             }
             set
             {
+                if (backColor == value)
+                    return;
+
                 backColor = value;
 
                 var trimmedFore = foreColor.ToString("X").TrimStart('0');
@@ -59,6 +70,9 @@ namespace ConsolePanel.Gui
             }
             set
             {
+                if (foreColor == value)
+                    return;
+
                 foreColor = value;
 
                 var trimmedFore = foreColor.ToString("X").TrimStart('0');
@@ -93,13 +107,14 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public ConsolePanel(string workingDirectory = null)
+        public ConsolePanel(bool init = true, string workingDirectory = null)
         {
             InitializeComponent();
 
             lastWorkingDir = workingDirectory;
 
-            Recreate();
+            if (init)
+                Create();
         }
 
         /// <summary>
@@ -120,9 +135,9 @@ namespace ConsolePanel.Gui
         }
 
         /// <summary>
-        /// Recreates the console window if it was closed
+        /// Creates the console window if it was closed / not created yet
         /// </summary>
-        public void Recreate()
+        public void Create()
         {
             if (process != null && !process.HasExited)
             {
