@@ -14,8 +14,18 @@ namespace DSLCompletion
         {
             var hxproj = PluginBase.CurrentProject as HaxeProject;
             var haxeContext = (AS2Context.Context)ASCompletion.Context.ASContext.GetLanguageContext(PluginBase.CurrentProject.Language);
-            if (haxeContext.CurrentModel == null) //workaround for bug
-                haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+
+            #region Workaround for bug
+            haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+            if (AS2Context.Context.Panel.InvokeRequired)
+            {
+                AS2Context.Context.Panel.Invoke((System.Windows.Forms.MethodInvoker)delegate
+                {
+                    haxeContext.CurrentFile = "";
+                });
+            }
+            #endregion
+
             var classes = haxeContext.GetAllProjectClasses();
             foreach (var model in classes.Items)
             {
@@ -96,8 +106,18 @@ namespace DSLCompletion
 
             var hxproj = PluginBase.CurrentProject as HaxeProject;
             var haxeContext = (AS2Context.Context)ASCompletion.Context.ASContext.GetLanguageContext(PluginBase.CurrentProject.Language);
-            if (haxeContext.CurrentModel == null) //workaround for bug
-                haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+
+            #region Workaround for bug
+            haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+            if (AS2Context.Context.Panel.InvokeRequired)
+            {
+                AS2Context.Context.Panel.Invoke((System.Windows.Forms.MethodInvoker)delegate
+                {
+                    haxeContext.CurrentFile = "";
+                });
+            }
+            #endregion
+
             var classes = haxeContext.GetAllProjectClasses();
 
             foreach (var model in classes.Items)
