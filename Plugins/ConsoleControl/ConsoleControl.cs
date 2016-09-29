@@ -59,7 +59,7 @@ namespace ConsoleControl
                 if (trimmedBack == "")
                     trimmedBack = "0";
 
-                SendString("COLOR " + trimmedBack + trimmedFore);
+                SendString("color " + trimmedBack + trimmedFore);
                 SendString("cls");
             }
         }
@@ -84,7 +84,7 @@ namespace ConsoleControl
                 if (trimmedBack == "")
                     trimmedBack = "0";
 
-                SendString("COLOR " + trimmedBack + trimmedFore);
+                SendString("color " + trimmedBack + trimmedFore);
                 SendString("cls");
             }
         }
@@ -117,6 +117,7 @@ namespace ConsoleControl
         public ConsoleControl(bool init = true, string workingDirectory = null)
         {
             InitializeComponent();
+            SetStyle(ControlStyles.Selectable, true);
 
             lastWorkingDir = workingDirectory;
 
@@ -256,7 +257,6 @@ namespace ConsoleControl
                 SetRealConsoleSize();
             }
 
-            //realSize = WinApi.GetClientRect(cmdHandle).Size;
             pnlClipping.Size = realSize;
         }
 
@@ -307,12 +307,13 @@ namespace ConsoleControl
 
         private void CmdPanel_Enter(object sender, EventArgs e)
         {
+            try
+            {
+                window.SetFocus();
+            }
+            catch { }
+            
             ProcessCommandCache();
-        }
-
-        private void CmdPanel_Paint(object sender, PaintEventArgs e)
-        {
-            WinApi.ResizeClientRectTo(cmdHandle, new Rectangle(new Point(0, 0), Size));
         }
     }
 }

@@ -24,16 +24,16 @@
             this.pnlClipping.Name = "pnlClipping";
             this.pnlClipping.Size = new System.Drawing.Size(128, 103);
             this.pnlClipping.TabIndex = 0;
+            this.pnlClipping.Enter += new System.EventHandler(this.CmdPanel_Enter);
             // 
-            // CmdPanel
+            // ConsoleControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlClipping);
             this.ForeColor = System.Drawing.Color.White;
-            this.Name = "CmdPanel";
+            this.Name = "ConsoleControl";
             this.Size = new System.Drawing.Size(246, 149);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.CmdPanel_Paint);
             this.Enter += new System.EventHandler(this.CmdPanel_Enter);
             this.Resize += new System.EventHandler(this.CmdPanel_Resize);
             this.ResumeLayout(false);

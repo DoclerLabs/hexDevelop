@@ -6,8 +6,6 @@ using PluginCore.Managers;
 using PluginCore.Utilities;
 using System.IO;
 using PluginCore.Helpers;
-using PluginCore.Controls;
-using ScintillaNet;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing;
