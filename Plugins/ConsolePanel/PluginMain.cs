@@ -177,6 +177,8 @@ namespace ConsolePanel
                 }
             };
 
+            cmdPanel.Create();
+
             tabView.AddConsole(cmdPanel);
 
             return cmdPanel;
