@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ProjectManager.Projects;
+using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace YeomanTemplates.gui.controls
@@ -23,9 +25,9 @@ namespace YeomanTemplates.gui.controls
             // cmdConsole
             // 
             this.cmdConsole = new ConsoleControl.ConsoleControl(true, workingDirectory);
-            this.cmdConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdConsole.Anchor = (((AnchorStyles.Top | AnchorStyles.Bottom)
+            | AnchorStyles.Left)
+            | AnchorStyles.Right);
             this.cmdConsole.Location = new System.Drawing.Point(0, 16);
             this.cmdConsole.Name = "cmdConsole";
             this.cmdConsole.Size = new System.Drawing.Size(677, 234);
@@ -37,12 +39,20 @@ namespace YeomanTemplates.gui.controls
 
         private void cmdConsole_Exited(object sender, EventArgs e)
         {
-            if (ParentForm != null && ParentForm.InvokeRequired)
+            if (ParentForm == null || ParentForm.IsDisposed)
+                return;
+
+            if (ParentForm.InvokeRequired)
             {
-                ParentForm.Invoke((MethodInvoker)delegate
+                try
                 {
-                    RaiseReadyEvent();
-                });
+                    ParentForm.Invoke((MethodInvoker)delegate
+                    {
+                        RaiseReadyEvent();
+                    });
+                }
+                catch { }
+                
             }
             else
             {
@@ -70,7 +80,33 @@ namespace YeomanTemplates.gui.controls
             var form = (frmRunYeoman)ParentForm;
             form.DisableBack();
 
-            var command = yoCommand + " " + generator + " && exit";
+            var proj = PluginCore.PluginBase.CurrentProject as Project;
+            
+            var generatorKey = "yeomanoptions_" + generator;
+
+            var options = "";
+            if (proj.Storage.ContainsKey(generatorKey))
+            {
+                options = proj.Storage[generatorKey];
+            }
+            else
+            {
+                #region hexMachina specific
+                if (generator.StartsWith("hex:") || generator == "hex")
+                {
+                    options = "--currentPackage=\"$(Package)\"";
+                }
+                #endregion
+
+                proj.Storage.Add(generatorKey, options);
+            }
+
+            //replace $(Placeholders)
+            options = PluginCore.PluginBase.MainForm.ProcessArgString(options);
+            options = options.Replace("$(Package)", GetPackage(Environment.CurrentDirectory));
+            options = options.Replace("$(FolderName)", Environment.CurrentDirectory);
+
+            var command = yoCommand + " " + generator + " " + options + " && exit";
 
             cmdConsole.SendString(command);
             ParentForm.FormClosed += ParentForm_FormClosed;
@@ -84,6 +120,31 @@ namespace YeomanTemplates.gui.controls
         public void RaiseReadyEvent()
         {
             if (Ready != null) Ready(this, new EventArgs());
+        }
+
+        string GetPackage(string directory)
+        {
+            var project = PluginCore.PluginBase.CurrentProject as ProjectManager.Projects.Haxe.HaxeProject;
+            var package = "";
+
+            
+            string classpath = project.AbsoluteClasspaths.GetClosestParent(directory);
+
+            if (classpath == null)
+            {
+                var collection = new PathCollection();
+                foreach (var path in ProjectManager.PluginMain.Settings.GlobalClasspaths)
+                {
+                    collection.Add(path);
+                }
+                classpath = collection.GetClosestParent(directory);
+            }
+            if (classpath != null)
+            {
+                package = ProjectPaths.GetRelativePath(classpath, directory).Replace(Path.DirectorySeparatorChar, '.');
+            }
+
+            return package;
         }
     }
 }

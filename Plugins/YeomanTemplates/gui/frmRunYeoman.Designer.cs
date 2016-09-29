@@ -51,7 +51,7 @@
             this.tlpMain.RowCount = 2;
             this.tlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tlpMain.Size = new System.Drawing.Size(270, 209);
+            this.tlpMain.Size = new System.Drawing.Size(709, 450);
             this.tlpMain.TabIndex = 1;
             // 
             // pnlControls
@@ -60,15 +60,15 @@
             this.pnlControls.Controls.Add(this.btnNext);
             this.pnlControls.Controls.Add(this.btnBack);
             this.pnlControls.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlControls.Location = new System.Drawing.Point(3, 181);
+            this.pnlControls.Location = new System.Drawing.Point(3, 422);
             this.pnlControls.Name = "pnlControls";
-            this.pnlControls.Size = new System.Drawing.Size(264, 25);
+            this.pnlControls.Size = new System.Drawing.Size(703, 25);
             this.pnlControls.TabIndex = 1;
             // 
             // btnCancel
             // 
             this.btnCancel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnCancel.Location = new System.Drawing.Point(189, 0);
+            this.btnCancel.Location = new System.Drawing.Point(628, 0);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 25);
             this.btnCancel.TabIndex = 2;
@@ -103,14 +103,14 @@
             this.pnlPage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlPage.Location = new System.Drawing.Point(3, 3);
             this.pnlPage.Name = "pnlPage";
-            this.pnlPage.Size = new System.Drawing.Size(264, 172);
+            this.pnlPage.Size = new System.Drawing.Size(703, 413);
             this.pnlPage.TabIndex = 2;
             // 
             // frmRunYeoman
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(270, 209);
+            this.ClientSize = new System.Drawing.Size(709, 450);
             this.Controls.Add(this.tlpMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmRunYeoman";
