@@ -64,7 +64,7 @@ namespace DSLCompletion
             var file = result[0];
             var pos = result[1];
 
-            callback(new PositionResult(file, Int32.Parse(pos)));
+            callback(new PositionResult(file, Int32.Parse(pos), false));
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace DSLCompletion
 {
     /// <summary>
-    /// Tries to get some completion info out of files without using the haxe compiler
+    /// Tries to get some completion info out of FlashDevelop without using the haxe compiler
     /// </summary>
     class FallbackCompletionHandler : ICompletionHandler
     {
@@ -16,7 +16,7 @@ namespace DSLCompletion
             var haxeContext = (AS2Context.Context)ASCompletion.Context.ASContext.GetLanguageContext(PluginBase.CurrentProject.Language);
 
             #region Workaround for bug
-            haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+            haxeContext.CurrentModel = new ASCompletion.Model.FileModel();
             if (AS2Context.Context.Panel.InvokeRequired)
             {
                 AS2Context.Context.Panel.Invoke((System.Windows.Forms.MethodInvoker)delegate
@@ -27,17 +27,27 @@ namespace DSLCompletion
             #endregion
 
             var classes = haxeContext.GetAllProjectClasses();
+
+            #region Reset workaround for bug
+            haxeContext.CurrentFile = null;
+            #endregion
+
+            var split = new List<string>(type.Split('.'));
+            var clazz = split[split.Count - 1];
+            split.RemoveAt(split.Count - 1);
+            var package = string.Join(".", split.ToArray());
+
             foreach (var model in classes.Items)
             {
-                var isModule = model.Name == type;
-                if (isModule)
+                if (type == model.Name)
                 {
-                }
-                else if (type.StartsWith(model.Name + "."))
-                {
-                    foreach (var clazz in model.InFile.Classes)
+                    var t = model.GetType();
+
+                    var classModel = haxeContext.GetModel(package, clazz, "");
+                    
+                    if (classModel.InFile != null)
                     {
-                        PluginCore.Managers.TraceManager.Add(clazz.FullName);
+                        callback(new PositionResult(classModel.InFile.FileName, classModel.LineFrom, true));
                     }
                 }
             }
@@ -108,7 +118,7 @@ namespace DSLCompletion
             var haxeContext = (AS2Context.Context)ASCompletion.Context.ASContext.GetLanguageContext(PluginBase.CurrentProject.Language);
 
             #region Workaround for bug
-            haxeContext.CurrentModel = haxeContext.GetCachedFileModel(hxproj.CompilerOptions.MainClass);
+            haxeContext.CurrentModel = new ASCompletion.Model.FileModel();
             if (AS2Context.Context.Panel.InvokeRequired)
             {
                 AS2Context.Context.Panel.Invoke((System.Windows.Forms.MethodInvoker)delegate
@@ -120,12 +130,12 @@ namespace DSLCompletion
 
             var classes = haxeContext.GetAllProjectClasses();
 
+            #region Reset workaround for bug
+            haxeContext.CurrentFile = null;
+            #endregion
+
             foreach (var model in classes.Items)
             {
-                //var isModule = model.Name == path.TrimEnd('.');
-                //if (isModule)
-                //{
-                //}
                 if (model.Name.StartsWith(path))
                 {
                     var completion = model.Name.Substring(path.Length);
@@ -190,12 +200,24 @@ namespace DSLCompletion
 
             var hxproj = PluginBase.CurrentProject as HaxeProject;
             var haxeContext = (AS2Context.Context)ASCompletion.Context.ASContext.GetLanguageContext(PluginBase.CurrentProject.Language);
-            
-            if (haxeContext.CurrentModel == null)
+
+            #region Workaround for bug
+            haxeContext.CurrentModel = new ASCompletion.Model.FileModel();
+            if (AS2Context.Context.Panel.InvokeRequired)
             {
-                haxeContext.CurrentModel = haxeContext.GetFileModel(hxproj.CompilerOptions.MainClass);
+                AS2Context.Context.Panel.Invoke((System.Windows.Forms.MethodInvoker)delegate
+                {
+                    haxeContext.CurrentFile = "";
+                });
             }
+            #endregion
+
             var classes = haxeContext.GetAllProjectClasses();
+
+            #region Reset workaround for bug
+            haxeContext.CurrentFile = null;
+            #endregion
+
             foreach (var model in classes.Items)
             {
                 if (model.Name.EndsWith("." + clazz) && !results.Contains(model.Name))
@@ -233,14 +255,14 @@ namespace DSLCompletion
             callback(results);
         }
 
-        PositionResult checkType(string path, string type)
-        {
-            var file = Path.Combine(path, type + ".hx");
-            if (File.Exists(file))
-            {
-                return new PositionResult(file, 0);
-            }
-            return null;
-        }
+        //PositionResult checkType(string path, string type)
+        //{
+        //    var file = Path.Combine(path, type + ".hx");
+        //    if (File.Exists(file))
+        //    {
+        //        return new PositionResult(file, 0, false);
+        //    }
+        //    return null;
+        //}
     }
 }

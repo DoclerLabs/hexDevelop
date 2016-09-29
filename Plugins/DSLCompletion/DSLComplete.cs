@@ -179,7 +179,7 @@ namespace DSLCompletion
             {
                 if (str == null) return;
 
-                var pos = new PositionResult(str, 0);
+                var pos = new PositionResult(str, 0, false);
                 FixPath(pos);
 
                 InvokeSci(delegate
@@ -387,7 +387,15 @@ namespace DSLCompletion
             if (result == null) return;
 
             PluginBase.MainForm.OpenEditableDocument(result.file, false);
-            PluginBase.MainForm.CurrentDocument.SciControl.GotoPos(result.pos);
+            if (result.lines)
+            {
+                PluginBase.MainForm.CurrentDocument.SciControl.GotoLine(result.pos);
+            }
+            else
+            {
+                PluginBase.MainForm.CurrentDocument.SciControl.GotoPos(result.pos);
+            }
+            
         }
     }
 
