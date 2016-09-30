@@ -30,7 +30,7 @@ namespace YeomanTemplates.gui.controls
             }
             catch (Exception e)
             {
-                PluginCore.Managers.ErrorManager.ShowError("Error running yo: " + yoCmd, e);
+                PluginCore.Managers.ErrorManager.ShowError("Error running yo, please check if the command in the settings is correct: " + yoCmd, e);
             }
         }
 
