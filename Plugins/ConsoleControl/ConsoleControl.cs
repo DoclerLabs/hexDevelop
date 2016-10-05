@@ -137,7 +137,12 @@ namespace ConsoleControl
                 if (!process.HasExited)
                 {
                     SendString("^(c)", false);
-                    process.Kill();
+                    try
+                    {
+                        process.Kill();
+                    }
+                    catch { }
+                    
                 }
                 
                 process = null;
