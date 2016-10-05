@@ -113,7 +113,9 @@ namespace YeomanTemplates
                             //show wizard
                             var cwd = Environment.CurrentDirectory;
                             Environment.CurrentDirectory = directory;
-                            var runYo = new frmRunYeoman(directory, settingObject.YoCommand);
+
+                            var yoCmd = settingObject.YoCommand != null ? settingObject.YoCommand : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "yo.cmd");
+                            var runYo = new frmRunYeoman(directory, yoCmd);
                             runYo.ShowDialog(PluginBase.MainForm);
                             Environment.CurrentDirectory = cwd;
                         }

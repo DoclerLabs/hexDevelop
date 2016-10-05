@@ -24,7 +24,7 @@ namespace YeomanTemplates.gui.controls
             // 
             // cmdConsole
             // 
-            this.cmdConsole = new ConsoleControl.ConsoleControl(true, workingDirectory);
+            this.cmdConsole = new ConsoleControl.ConsoleControl("cmd", true, workingDirectory);
             this.cmdConsole.Anchor = (((AnchorStyles.Top | AnchorStyles.Bottom)
             | AnchorStyles.Left)
             | AnchorStyles.Right);

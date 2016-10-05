@@ -37,20 +37,6 @@ namespace ConsoleControl
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public class INPUT_RECORD_KEY
-    {
-        public Int16 EventType = 1;//this is only one of several possible cases of the INPUT_RECORD structure
-
-        //the rest of fields are from KEY_EVENT_RECORD :
-        public bool bKeyDown;
-        public Int16 wRepeatCount;
-        public Int16 wVirtualKeyCode;
-        public Int16 wVirtualScanCode;
-        public char UnicodeChar;
-        public Int32 dwControlKeyState;
-    }
-
     class WinApi
     {
         public const int GWL_STYLE = -16;

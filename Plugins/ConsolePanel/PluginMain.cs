@@ -155,7 +155,7 @@ namespace ConsolePanel
         {
             cmdPanelDockContent.Show();
 
-            var cmdPanel = new ConsoleControl.ConsoleControl(false);
+            var cmdPanel = new ConsoleControl.ConsoleControl("cmd", false);
             cmdPanel.Text = "Console";
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;
             cmdPanel.ConsoleForeColor = settingObject.ForegroundColor;

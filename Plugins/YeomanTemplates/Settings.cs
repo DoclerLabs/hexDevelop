@@ -6,9 +6,9 @@ namespace YeomanTemplates
     [Serializable]
     class Settings
     {
-        private string cmd = "yo";
+        private string cmd = "";
 
-        [DisplayName("Yo Command"), DefaultValue("yo")]
+        [DisplayName("Yo Command"), DefaultValue("")]
         public string YoCommand
         {
             get
