@@ -76,5 +76,10 @@ namespace YeomanTemplates
             currentPage.OnCancel();
             this.Close();
         }
+
+        private void frmRunYeoman_Move(object sender, EventArgs e)
+        {
+            ((UserControl)currentPage).Refresh();
+        }
     }
 }

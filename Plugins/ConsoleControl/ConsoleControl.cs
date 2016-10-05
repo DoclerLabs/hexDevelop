@@ -323,5 +323,10 @@ namespace ConsoleControl
             
             ProcessCommandCache();
         }
+
+        private void ConsoleControl_Paint(object sender, PaintEventArgs e)
+        {
+            ResizeConsole();
+        }
     }
 }

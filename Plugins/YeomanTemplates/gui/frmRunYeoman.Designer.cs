@@ -115,6 +115,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmRunYeoman";
             this.Text = "Yeoman generator";
+            this.Move += new System.EventHandler(this.frmRunYeoman_Move);
             this.tlpMain.ResumeLayout(false);
             this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
