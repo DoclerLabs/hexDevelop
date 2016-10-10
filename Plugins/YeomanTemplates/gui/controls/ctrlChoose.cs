@@ -67,5 +67,11 @@ namespace YeomanTemplates.gui.controls
         {
             if (Ready != null) Ready(this, new EventArgs());
         }
+
+        private void tvGenerator_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            var form = (frmRunYeoman)ParentForm;
+            form.NextPage();
+        }
     }
 }

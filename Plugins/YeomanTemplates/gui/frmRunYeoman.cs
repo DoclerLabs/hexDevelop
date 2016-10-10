@@ -22,6 +22,19 @@ namespace YeomanTemplates
             setPage(0);
         }
 
+        public void NextPage()
+        {
+            var data = currentPage.GetOutput();
+            setPage(currentPageIndex + 1);
+
+            currentPage.setInput(data);
+        }
+
+        public void PreviousPage()
+        {
+            setPage(currentPageIndex - 1);
+        }
+
         public void DisableBack()
         {
             btnBack.Enabled = false;
@@ -60,15 +73,12 @@ namespace YeomanTemplates
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            var data = currentPage.GetOutput();
-            setPage(currentPageIndex + 1);
-
-            currentPage.setInput(data);
+            NextPage();
         }
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            setPage(currentPageIndex - 1);
+            PreviousPage();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

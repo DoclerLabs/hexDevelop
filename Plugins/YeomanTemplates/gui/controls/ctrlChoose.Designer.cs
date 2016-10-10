@@ -43,6 +43,7 @@
             this.tvGenerator.Size = new System.Drawing.Size(236, 112);
             this.tvGenerator.TabIndex = 0;
             this.tvGenerator.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvGenerator_AfterSelect);
+            this.tvGenerator.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvGenerator_NodeMouseDoubleClick);
             // 
             // lblChoose
             // 
