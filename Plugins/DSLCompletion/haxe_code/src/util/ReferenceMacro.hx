@@ -221,7 +221,9 @@ class ReferenceMacro
 					if (fields == null) {
 						fields = new Array<Field> ();
 					}
-					fields = fields.concat (listFields (t, false));
+					var statics = listFields (t, false);
+					if (statics != null)
+						fields = fields.concat (statics);
 					
 					for (field in fields) {
 						if (field.name == name) {
@@ -236,7 +238,7 @@ class ReferenceMacro
 				default:
 			}
 		}
-		catch (e : Dynamic) {}
+		catch (e : Dynamic) { printError(e); }
 		
 		return false;
 	}
@@ -304,7 +306,7 @@ class ReferenceMacro
 	
 	static function printError (e : Dynamic) : Void
 	{
-		throw "ERROR: " + e;
+		neko.Lib.rethrow("ERROR: " + e);
 	}
 }
 

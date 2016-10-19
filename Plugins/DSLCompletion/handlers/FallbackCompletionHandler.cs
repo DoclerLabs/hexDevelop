@@ -31,26 +31,38 @@ namespace DSLCompletion
             #region Reset workaround for bug
             haxeContext.CurrentFile = null;
             #endregion
-
+            //Try to find class with given name
             var split = new List<string>(type.Split('.'));
             var clazz = split[split.Count - 1];
             split.RemoveAt(split.Count - 1);
             var package = string.Join(".", split.ToArray());
 
-            foreach (var model in classes.Items)
+            var classModel = haxeContext.GetModel(package, clazz, "");
+            if (classModel.InFile != null && classModel.InFile.FileName != "")
             {
-                if (type == model.Name)
-                {
-                    var t = model.GetType();
+                callback(new PositionResult(classModel.InFile.FileName, classModel.LineFrom, true));
+                return;
+            }
 
-                    var classModel = haxeContext.GetModel(package, clazz, "");
-                    
-                    if (classModel.InFile != null)
-                    {
-                        callback(new PositionResult(classModel.InFile.FileName, classModel.LineFrom, true));
-                    }
+            //Found no class, look for field in class
+            var field = clazz;
+            clazz = split[split.Count - 1];
+            split.RemoveAt(split.Count - 1);
+            package = string.Join(".", split.ToArray());
+
+            classModel = haxeContext.GetModel(package, clazz, "");
+            var members = classModel.Members;
+            foreach (ASCompletion.Model.MemberModel member in members)
+            {
+                if (member.Name == field && (member.Flags & ASCompletion.Model.FlagType.Constructor) == 0)
+                {
+                    callback(new PositionResult(classModel.InFile.FileName, member.LineFrom, true));
+                    return;
                 }
             }
+
+            //Nothing found
+            callback(null);
         }
 
         public void GetFile(string file, StringCallback callback)

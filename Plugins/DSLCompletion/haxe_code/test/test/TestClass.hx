@@ -1,5 +1,4 @@
 package test;
-import hex.ioc.parser.xml.mock.MockStubStatefulService;
 
 /**
  * ...
@@ -7,12 +6,11 @@ import hex.ioc.parser.xml.mock.MockStubStatefulService;
  */
 class TestClass
 {
-	public var xml : String;
+	public static var xml : String;
 	
 	public static function main () : Void
 	{
-		MockStubStatefulService;
-		var v : Test;
+		var v : TestEnum;
 	}
 
 	public function new ()

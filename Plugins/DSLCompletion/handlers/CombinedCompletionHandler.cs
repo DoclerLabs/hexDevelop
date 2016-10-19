@@ -37,7 +37,17 @@ namespace DSLCompletion
 
         public void GetPosition(string type, PositionCallback callback)
         {
-            fallbackHandler.GetPosition(type, callback);
+            fallbackHandler.GetPosition(type, delegate (PositionResult pos)
+            {
+                if (pos != null)
+                {
+                    callback(pos);
+                }
+                else
+                {
+                    compilerHandler.GetPosition(type, callback);
+                }
+            });
         }
 
         public void GetCompletion(string path, ListCallback callback)
