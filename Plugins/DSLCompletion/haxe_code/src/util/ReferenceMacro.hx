@@ -93,8 +93,6 @@ class ReferenceMacro
 		
 		if (!code.endsWith (".")) return;
 		
-		//TODO: consider using onGenerate
-		
 		code = code.substr (0, code.length - 1);
 		
 		var lst = listFields (code);

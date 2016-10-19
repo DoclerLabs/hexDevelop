@@ -51,38 +51,6 @@ namespace DSLCompletion
                     }
                 }
             }
-
-            //var hxproj = (PluginBase.CurrentProject as HaxeProject);
-            //var paths = ProjectManager.PluginMain.Settings.GlobalClasspaths;
-            //paths.AddRange(hxproj.Classpaths);
-
-            //var classPaths = paths.ToArray();
-
-            //type = type.Replace(".", "/");
-
-            //foreach (string path in classPaths)
-            //{
-            //    //look for module with type as file
-            //    var result = checkType(path, type);
-            //    if (result != null)
-            //    {
-            //        callback(result);
-            //        return;
-            //    }
-                    
-
-            //    //look if class is within another module
-            //    var splitter = type.LastIndexOf("/");
-            //    var module = type.Substring(0, splitter);
-            //    var typeName = type.Substring(splitter + 1);
-
-            //    result = checkType(path, module);
-            //    if (result != null)
-            //    {
-            //        callback(result);
-            //        return;
-            //    }
-            //}
         }
 
         public void GetFile(string file, StringCallback callback)
@@ -146,50 +114,7 @@ namespace DSLCompletion
                 }
             }
 
-
-            //var hxproj = (PluginBase.CurrentProject as HaxeProject);
-            //var paths = ProjectManager.PluginMain.Settings.GlobalClasspaths;
-            //paths.AddRange(hxproj.Classpaths);
-
-            //var classPaths = paths.ToArray();
-
-            //path = path.Replace(".", "/");
-            //PluginCore.Managers.TraceManager.Add(path);
-            //var list = new List<string>();
-
-            //foreach (string cp in classPaths)
-            //{
-            //    var file = Path.Combine(cp, path.TrimEnd('/') + ".hx");
-            //    var folder = Path.Combine(cp, path);
-            //    PluginCore.Managers.TraceManager.Add(file);
-            //    if (File.Exists(file)) //the given path is a module
-            //    {
-            //        return null; //not smart enough to parse haxe code
-            //    }
-            //    if (Directory.Exists(folder))
-            //    {
-            //        foreach (string pack in Directory.GetDirectories(folder))
-            //        {
-            //            var packName = Path.GetFileName(pack);
-            //            if (!list.Contains(packName))
-            //                list.Add(packName);
-            //        }
-            //        list.Sort();
-
-            //        var modules = new List<string>();
-            //        foreach (string module in Directory.GetFiles(folder, "*.hx", SearchOption.TopDirectoryOnly))
-            //        {
-            //            var moduleName = Path.GetFileNameWithoutExtension(module);
-            //            if (!modules.Contains(moduleName))
-            //                modules.Add(moduleName);
-            //        }
-
-            //        modules.Sort();
-            //        list.AddRange(modules);
-            //    }
-            //}
-
-            if (list.Count == 0) return;
+            //if (list.Count == 0) return;
 
             callback(list);
         }
@@ -226,43 +151,9 @@ namespace DSLCompletion
                 }
             }
 
-            //var hxproj = (PluginBase.CurrentProject as HaxeProject);
-            //var paths = ProjectManager.PluginMain.Settings.GlobalClasspaths;
-            //paths.AddRange(hxproj.Classpaths);
-            //var classPaths = paths.ToArray();
-
-            //foreach (string cp in classPaths)
-            //{
-            //    if (Directory.Exists(cp))
-            //    {
-            //        foreach (string moduleName in Directory.GetFiles(cp, "*.hx", SearchOption.AllDirectories))
-            //        {
-            //            var fileName = Path.GetFileName(moduleName);
-            //            if (fileName == clazz + ".hx")
-            //            {
-            //                var path = moduleName.Substring(cp.Length + 1); //remove cp and "."
-            //                path = path.Substring(0, path.Length - 3); //remove ".hx"
-            //                path = path.Replace('\\', '/').Replace('/', '.');
-            //                results.Add(path);
-            //            }
-            //        }
-            //    }
-            //}
-
-            if (results.Count == 0)
-                return;
+            //if (results.Count == 0) return;
 
             callback(results);
         }
-
-        //PositionResult checkType(string path, string type)
-        //{
-        //    var file = Path.Combine(path, type + ".hx");
-        //    if (File.Exists(file))
-        //    {
-        //        return new PositionResult(file, 0, false);
-        //    }
-        //    return null;
-        //}
     }
 }
