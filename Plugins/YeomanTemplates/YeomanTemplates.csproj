@@ -53,6 +53,7 @@
     <Compile Include="gui\frmRunYeoman.Designer.cs">
       <DependentUpon>frmRunYeoman.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\NestedStringList.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -99,6 +100,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="yeoman.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

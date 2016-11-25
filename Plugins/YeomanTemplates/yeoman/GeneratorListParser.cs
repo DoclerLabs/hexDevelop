@@ -4,17 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using YeomanTemplates.Helper;
 
 namespace YeomanTemplates.yeoman
 {
     class GeneratorListParser
     {
-        private TreeView view;
-        private TreeNode lastMainGen;
+        public readonly NestedStringList Result;
+        private NestedStringList lastMainGen;
 
-        public GeneratorListParser(TreeView view)
+        public GeneratorListParser()
         {
-            this.view = view;
+            Result = new NestedStringList(null);
         }
 
         public void ParseInput(StreamReader reader)
@@ -24,8 +25,6 @@ namespace YeomanTemplates.yeoman
                 var line = reader.ReadLine();
                 ParseLine(line);
             }
-
-            EndParse();
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace YeomanTemplates.yeoman
         /// The output has to be parsed from top to bottom
         /// </summary>
         /// <param name="line"></param>
-        public void ParseLine(string line)
+        private void ParseLine(string line)
         {
             if (line.StartsWith("    ")) //sub-generator
             {
@@ -43,21 +42,16 @@ namespace YeomanTemplates.yeoman
                     return;
                 }
 
-                var node = new TreeNode(line.Substring(4));
-                lastMainGen.Nodes.Add(node);
+                var node = new NestedStringList(line.Substring(4));
+                lastMainGen.Add(node);
             }
             else if (line.StartsWith("  ")) //generator
             {
-                var node = new TreeNode(line.Substring(2));
+                var node = new NestedStringList(line.Substring(2));
                 lastMainGen = node;
-                view.Nodes.Add(node);
+                Result.Add(node);
             }
             //else ignore
-        }
-
-        public void EndParse()
-        {
-            view.ExpandAll();
         }
     }
 }

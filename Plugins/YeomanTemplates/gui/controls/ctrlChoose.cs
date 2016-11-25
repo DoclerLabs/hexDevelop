@@ -23,8 +23,9 @@ namespace YeomanTemplates.gui.controls
 
                 var reader = yo.StandardOutput;
 
-                var parser = new yeoman.GeneratorListParser(tvGenerator);
+                var parser = new yeoman.GeneratorListParser();
                 parser.ParseInput(reader);
+                //for (var p : parser.Result);
 
                 reader.Dispose();
             }
