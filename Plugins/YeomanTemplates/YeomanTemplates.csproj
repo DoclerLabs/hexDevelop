@@ -34,23 +34,23 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="gui\controls\ctrlChoose.cs">
+    <Compile Include="Gui\Controls\ctrlChoose.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="gui\controls\ctrlChoose.Designer.cs">
+    <Compile Include="Gui\Controls\ctrlChoose.Designer.cs">
       <DependentUpon>ctrlChoose.cs</DependentUpon>
     </Compile>
-    <Compile Include="gui\controls\ctrlCmd.cs">
+    <Compile Include="Gui\Controls\ctrlCmd.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="gui\controls\ctrlCmd.Designer.cs">
+    <Compile Include="Gui\Controls\ctrlCmd.Designer.cs">
       <DependentUpon>ctrlCmd.cs</DependentUpon>
     </Compile>
-    <Compile Include="gui\controls\PageControl.cs" />
-    <Compile Include="gui\frmRunYeoman.cs">
+    <Compile Include="Gui\Controls\PageControl.cs" />
+    <Compile Include="Gui\frmRunYeoman.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="gui\frmRunYeoman.Designer.cs">
+    <Compile Include="Gui\frmRunYeoman.Designer.cs">
       <DependentUpon>frmRunYeoman.cs</DependentUpon>
     </Compile>
     <Compile Include="Helper\NestedStringList.cs" />
@@ -62,8 +62,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="yeoman\GeneratorListParser.cs" />
-    <Compile Include="yeoman\YoHelper.cs" />
+    <Compile Include="Yeoman\GeneratorListParser.cs" />
+    <Compile Include="Yeoman\YoHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\hexDevelop\Plugins\ConsoleControl\ConsoleControl.csproj">
@@ -82,13 +82,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="gui\controls\ctrlChoose.resx">
+    <EmbeddedResource Include="Gui\Controls\ctrlChoose.resx">
       <DependentUpon>ctrlChoose.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="gui\controls\ctrlCmd.resx">
+    <EmbeddedResource Include="Gui\Controls\ctrlCmd.resx">
       <DependentUpon>ctrlCmd.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="gui\frmRunYeoman.resx">
+    <EmbeddedResource Include="Gui\frmRunYeoman.resx">
       <DependentUpon>frmRunYeoman.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
