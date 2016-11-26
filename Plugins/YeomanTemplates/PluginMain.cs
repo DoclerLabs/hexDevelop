@@ -110,26 +110,7 @@ namespace YeomanTemplates
             {
                 case EventType.Command:
                     var data = (DataEvent)e;
-                    if (data.Action == "ProjectManager.CreateNewFile")
-                    {
-                        var table = data.Data as System.Collections.Hashtable;
-                        var templatePath = table["templatePath"] as String;
-                        var directory = table["inDirectory"] as String;
-                        
-                        if (templatePath.EndsWith("Yeoman.fdt"))
-                        {
-                            e.Handled = true; //make sure no other plugin generates stuff
-                            
-                            //show wizard
-                            var cwd = Environment.CurrentDirectory;
-                            Environment.CurrentDirectory = directory;
-
-                            var runYo = new frmRunYeoman(directory, GetYoCommand());
-                            runYo.ShowDialog(PluginBase.MainForm);
-                            Environment.CurrentDirectory = cwd;
-                        }
-                    }
-                    else if (data.Action == "ProjectManager.TreeSelectionChanged")
+                    if (data.Action == "ProjectManager.TreeSelectionChanged" && ProjectTreeView.Instance.SelectedNode is DirectoryNode)
                     {
                         AddYeomanMenu();
                     }
@@ -197,8 +178,8 @@ namespace YeomanTemplates
                 item.Image = icon;
                 item.Click += delegate
                 {
-                    var proc = YoHelper.GetVisibleYo(GetYoCommand());
-                    proc.StartInfo.Arguments = parent.Value;
+                    var dir = ProjectTreeView.Instance.SelectedNode.BackingPath;
+                    var proc = YoHelper.GetYoGenerator(GetYoCommand(), parent.Value, dir);
                     proc.Start();
                 };
 
@@ -208,10 +189,9 @@ namespace YeomanTemplates
                     childItem.Image = icon;
                     childItem.Click += delegate
                     {
-                        var proc = YoHelper.GetVisibleYo(GetYoCommand());
-                        proc.StartInfo.Arguments = parent.Value + ":" + child.Value;
+                        var dir = ProjectTreeView.Instance.SelectedNode.BackingPath;
+                        var proc = YoHelper.GetYoGenerator(GetYoCommand(), parent.Value + ":" + child.Value, dir);
                         proc.Start();
-                        //MessageBox.Show(parent.Value + ":" + child.Value);
                     };
 
                     item.DropDownItems.Add(childItem);

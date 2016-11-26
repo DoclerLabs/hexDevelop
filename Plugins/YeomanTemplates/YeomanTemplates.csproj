@@ -34,25 +34,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Gui\Controls\ctrlChoose.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Gui\Controls\ctrlChoose.Designer.cs">
-      <DependentUpon>ctrlChoose.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Gui\Controls\ctrlCmd.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Gui\Controls\ctrlCmd.Designer.cs">
-      <DependentUpon>ctrlCmd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Gui\Controls\PageControl.cs" />
-    <Compile Include="Gui\frmRunYeoman.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Gui\frmRunYeoman.Designer.cs">
-      <DependentUpon>frmRunYeoman.cs</DependentUpon>
-    </Compile>
     <Compile Include="Helper\NestedStringList.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,15 +63,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Gui\Controls\ctrlChoose.resx">
-      <DependentUpon>ctrlChoose.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Gui\Controls\ctrlCmd.resx">
-      <DependentUpon>ctrlCmd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Gui\frmRunYeoman.resx">
-      <DependentUpon>frmRunYeoman.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
