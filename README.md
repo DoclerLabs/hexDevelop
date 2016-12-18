@@ -21,17 +21,18 @@ Auto-completion for hexMachina DSL.
 
 
 ### YeomanTemplates
-Run Yeoman generators from within FlashDevelop
+Run Yeoman generators from within FlashDevelop.
 
 #### Usage
  * Open a project
  * Right click the folder you want to run the generator in
- * Click "Add -> New Yeoman File..."
- * Choose a generator (or sub-generator) from the list
+ * Open the "Add" menu.
+ * You should see your generator in the list. If you want a sub-generator,
+ hover over the generator and wait until the list of sub-generators shows up.
  * Answer the questions
 
 ### ConsolePanel
-Adds a console panel to the FlashDevelop window
+Adds a console panel to the FlashDevelop window.
 
 #### Features
  * Multiple console tabs
