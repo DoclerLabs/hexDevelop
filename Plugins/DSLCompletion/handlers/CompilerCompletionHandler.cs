@@ -72,7 +72,14 @@ namespace DSLCompletion
         /// </summary>
         public void GetCompletion(string path, ListCallback callback)
         {
-            setupProcess();
+            try
+            {
+                setupProcess();
+            }
+            catch(Exception e)
+            {
+                return;
+            }
 
             var args = GetArgs();
             args.Insert(0, "--macro \"util.ReferenceMacro.getCompletion('" + path + "')\"");
@@ -131,6 +138,11 @@ namespace DSLCompletion
         /// </summary>
         private Process CreateProcess()
         {
+            if (PluginBase.CurrentSDK.Path == null)
+            {
+                throw new Exception("Please setup haxe SDK");
+            }
+
             var path = Path.Combine(PluginBase.CurrentSDK.Path, "haxe.exe");
 
             var proc = new Process();

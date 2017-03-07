@@ -298,8 +298,12 @@ namespace DSLCompletion
                 }
             }
 
-            var selection = sci.Text.Substring(left, right - left + 1);
-            return selection;
+            try
+            {
+                var selection = sci.Text.Substring(left, right - left + 1);
+                return selection;
+            } catch (Exception e) { return null; }
+            
         }
 
         /// <summary>
