@@ -300,7 +300,7 @@ namespace DSLCompletion
 
             try
             {
-                var selection = sci.Text.Substring(left, right - left + 1);
+                var selection = sci.GetTextRange(left, right + 1);
                 return selection;
             } catch (Exception e) { return null; }
             
