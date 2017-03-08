@@ -255,6 +255,8 @@ namespace DSLCompletion
             
             var text = sci.GetLine(sci.CurrentLine);
 
+            if (!text.Contains("\"")) return null;
+
             var lineStart = sci.PositionFromLine(sci.CurrentLine);
             var lineEnd = lineStart + sci.LineLength(sci.CurrentLine);
             int left = sci.CurrentPos - 1;
