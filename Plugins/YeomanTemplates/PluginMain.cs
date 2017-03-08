@@ -9,11 +9,16 @@ using PluginCore.Helpers;
 using PluginCore.Controls;
 using ScintillaNet;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using YeomanTemplates.yeoman;
+using ProjectManager.Controls.TreeView;
 
 namespace YeomanTemplates
 {
     public class PluginMain : IPlugin
     {
+
+        #region Addon Metadata
         private String pluginName = "YeomanTemplates";
         private String pluginGuid = "6809C145-1FCC-453F-9688-F7AC40690F64";
         private String pluginHelp = "http://hexmachina.org/";
@@ -80,11 +85,16 @@ namespace YeomanTemplates
                 return settingObject;
             }
         }
+        #endregion
+
+        private List<ToolStripItem> yeomanMenu = new List<ToolStripItem>();
 
         public void Initialize()
         {
             InitBasics();
             LoadSettings();
+
+            CacheGenerators();
 
             EventManager.AddEventHandler(this, EventType.Command, HandlingPriority.Normal);
         }
@@ -100,25 +110,9 @@ namespace YeomanTemplates
             {
                 case EventType.Command:
                     var data = (DataEvent)e;
-                    if (data.Action == "ProjectManager.CreateNewFile")
+                    if (data.Action == "ProjectManager.TreeSelectionChanged" && ProjectTreeView.Instance.SelectedNode is DirectoryNode)
                     {
-                        var table = data.Data as System.Collections.Hashtable;
-                        var templatePath = table["templatePath"] as String;
-                        var directory = table["inDirectory"] as String;
-                        
-                        if (templatePath.EndsWith("Yeoman.fdt"))
-                        {
-                            e.Handled = true; //make sure no other plugin generates stuff
-                            
-                            //show wizard
-                            var cwd = Environment.CurrentDirectory;
-                            Environment.CurrentDirectory = directory;
-
-                            var yoCmd = settingObject.YoCommand != "" ? settingObject.YoCommand : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm" + Path.DirectorySeparatorChar + "yo.cmd");
-                            var runYo = new frmRunYeoman(directory, yoCmd);
-                            runYo.ShowDialog(PluginBase.MainForm);
-                            Environment.CurrentDirectory = cwd;
-                        }
+                        AddYeomanMenu();
                     }
                     break;
             }
@@ -129,6 +123,32 @@ namespace YeomanTemplates
             string dataPath = Path.Combine(PathHelper.DataDir, pluginName);
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             this.settingFilename = Path.Combine(dataPath, "Settings.fdb");
+        }
+
+        private void AddYeomanMenu()
+        {
+            var menu = (ProjectContextMenu)ProjectTreeView.Instance.ContextMenuStrip;
+
+            if (menu.AddMenu.DropDownItems.Count == 0 || yeomanMenu.Count == 0) return;
+
+            int secondSeparator = -1;
+            int counter = 0;
+            for (int i = 0; i < menu.AddMenu.DropDownItems.Count; i++)
+            {
+                var item = menu.AddMenu.DropDownItems[i];
+
+                if (item is ToolStripSeparator && counter < 2)
+                {
+                    secondSeparator = i;
+                    counter++;
+                }
+            }
+
+            for (int i = yeomanMenu.Count - 1; i >= 0; i--)
+            {
+                menu.AddMenu.DropDownItems.Insert(secondSeparator, yeomanMenu[i]);
+            }
+            menu.AddMenu.DropDownItems.Insert(secondSeparator, new ToolStripSeparator());
         }
 
         private void LoadSettings()
@@ -145,6 +165,44 @@ namespace YeomanTemplates
         private void SaveSettings()
         {
             ObjectSerializer.Serialize(this.settingFilename, this.settingObject);
+        }
+
+        private void CacheGenerators()
+        {
+            var generators = YoHelper.GetYoGenerators(GetYoCommand());
+            var icon = Properties.Resources.yeoman.ToBitmap();
+
+            foreach (var parent in generators)
+            {
+                var item = new ToolStripMenuItem(parent.Value);
+                item.Image = icon;
+                item.Click += delegate
+                {
+                    var dir = ProjectTreeView.Instance.SelectedNode.BackingPath;
+                    var proc = YoHelper.GetYoGenerator(GetYoCommand(), parent.Value, dir);
+                    proc.Start();
+                };
+
+                foreach (var child in parent)
+                {
+                    var childItem = new ToolStripMenuItem(child.Value);
+                    childItem.Image = icon;
+                    childItem.Click += delegate
+                    {
+                        var dir = ProjectTreeView.Instance.SelectedNode.BackingPath;
+                        var proc = YoHelper.GetYoGenerator(GetYoCommand(), parent.Value + ":" + child.Value, dir);
+                        proc.Start();
+                    };
+
+                    item.DropDownItems.Add(childItem);
+                }
+                yeomanMenu.Add(item);
+            }
+        }
+
+        private String GetYoCommand()
+        {
+            return settingObject.YoCommand != "" ? settingObject.YoCommand : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm" + Path.DirectorySeparatorChar + "yo.cmd");
         }
     }
 }

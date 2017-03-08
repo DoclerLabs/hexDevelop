@@ -34,25 +34,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="gui\controls\ctrlChoose.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="gui\controls\ctrlChoose.Designer.cs">
-      <DependentUpon>ctrlChoose.cs</DependentUpon>
-    </Compile>
-    <Compile Include="gui\controls\ctrlCmd.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="gui\controls\ctrlCmd.Designer.cs">
-      <DependentUpon>ctrlCmd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="gui\controls\PageControl.cs" />
-    <Compile Include="gui\frmRunYeoman.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="gui\frmRunYeoman.Designer.cs">
-      <DependentUpon>frmRunYeoman.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Helper\NestedStringList.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -61,8 +43,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="yeoman\GeneratorListParser.cs" />
-    <Compile Include="yeoman\YoHelper.cs" />
+    <Compile Include="Yeoman\GeneratorListParser.cs" />
+    <Compile Include="Yeoman\YoHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\hexDevelop\Plugins\ConsoleControl\ConsoleControl.csproj">
@@ -81,15 +63,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="gui\controls\ctrlChoose.resx">
-      <DependentUpon>ctrlChoose.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="gui\controls\ctrlCmd.resx">
-      <DependentUpon>ctrlCmd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="gui\frmRunYeoman.resx">
-      <DependentUpon>frmRunYeoman.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -99,6 +72,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="yeoman.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
