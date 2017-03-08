@@ -18,8 +18,6 @@ namespace ConsoleControl
         ConsoleColor foreColor = ConsoleColor.White;
         List<string> commandsToDo = new List<string>();
         string lastWorkingDir;
-        string cmd;
-        string args;
 
         public event EventHandler Exited;
 
@@ -114,17 +112,15 @@ namespace ConsoleControl
         /// <summary>
         /// Creates a new ConsoleControl
         /// </summary>
-        /// <param name="init"></param>
+        /// <param name="init">If it should be created right away, if this is false, you have to call init manually</param>
         /// <param name="workingDirectory"></param>
-        public CmdControl(string command, string arg, bool init = true, string workingDirectory = null)
+        public CmdControl(bool init = true, string workingDirectory = null)
         {
             InitializeComponent();
             SetStyle(ControlStyles.Selectable, true);
             Dock = DockStyle.Fill;
 
             lastWorkingDir = workingDirectory;
-            cmd = command;
-            args = arg;
 
             if (init)
                 Create();
@@ -166,9 +162,7 @@ namespace ConsoleControl
             {
                 process = new Process();
 
-                process.StartInfo.FileName = cmd;
-                if (args != null)
-                    process.StartInfo.Arguments = args;
+                process.StartInfo.FileName = "cmd";
 
                 if (lastWorkingDir != null)
                     process.StartInfo.WorkingDirectory = lastWorkingDir;
@@ -188,6 +182,7 @@ namespace ConsoleControl
                 window = System.Windows.Automation.AutomationElement.FromHandle(cmdHandle);
                 WinApi.SetParent(cmdHandle, pnlClipping.Handle);
 
+                SendString("mode 250");
                 SendString("cls");
                 ResizeConsole();
             }
@@ -246,7 +241,6 @@ namespace ConsoleControl
         private void ResizeConsole()
         {
             WinApi.ShowWindow(cmdHandle, WinApi.SW_SHOWMAXIMIZED);
-            
             WinApi.ResizeClientRectTo(cmdHandle, new Rectangle(new Point(0, 0), Size));
 
             SetRealConsoleSize();

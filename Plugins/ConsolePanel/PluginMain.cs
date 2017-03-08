@@ -166,7 +166,7 @@ namespace ConsolePanel
         {
             cmdPanelDockContent.Show();
 
-            var cmdPanel = new ConsoleControl.CmdControl("cmd", cmd != null ? "/c " + cmd : null, false);
+            var cmdPanel = new ConsoleControl.CmdControl(false);
             cmdPanel.Text = "Console";
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;
             cmdPanel.ConsoleForeColor = settingObject.ForegroundColor;
@@ -188,6 +188,7 @@ namespace ConsolePanel
                 }
             };
 
+            cmdPanel.SendString(cmd);
             cmdPanel.Create();
 
             tabView.AddConsole(cmdPanel);
