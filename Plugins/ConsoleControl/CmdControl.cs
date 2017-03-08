@@ -7,7 +7,7 @@ using System.Windows.Automation;
 
 namespace ConsoleControl
 {
-    public partial class ConsoleControl : UserControl
+    public partial class CmdControl : UserControl, ConsoleProvider
     {
         Process process;
         IntPtr cmdHandle;
@@ -19,6 +19,7 @@ namespace ConsoleControl
         List<string> commandsToDo = new List<string>();
         string lastWorkingDir;
         string cmd;
+        string args;
 
         public event EventHandler Exited;
 
@@ -115,13 +116,15 @@ namespace ConsoleControl
         /// </summary>
         /// <param name="init"></param>
         /// <param name="workingDirectory"></param>
-        public ConsoleControl(string command, bool init = true, string workingDirectory = null)
+        public CmdControl(string command, string arg, bool init = true, string workingDirectory = null)
         {
             InitializeComponent();
             SetStyle(ControlStyles.Selectable, true);
+            Dock = DockStyle.Fill;
 
             lastWorkingDir = workingDirectory;
             cmd = command;
+            args = arg;
 
             if (init)
                 Create();
@@ -164,6 +167,8 @@ namespace ConsoleControl
                 process = new Process();
 
                 process.StartInfo.FileName = cmd;
+                if (args != null)
+                    process.StartInfo.Arguments = args;
 
                 if (lastWorkingDir != null)
                     process.StartInfo.WorkingDirectory = lastWorkingDir;

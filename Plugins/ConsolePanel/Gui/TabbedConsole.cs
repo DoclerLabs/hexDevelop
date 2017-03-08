@@ -9,7 +9,7 @@ namespace ConsolePanel.Gui
         //private List<CmdPanel> consoles;
         private PluginMain main;
 
-        public ICollection<ConsoleControl.ConsoleControl> Consoles
+        public ICollection<ConsoleControl.ConsoleProvider> Consoles
         {
             get
             {
@@ -17,25 +17,28 @@ namespace ConsolePanel.Gui
             }
         }
 
-        public Dictionary<ConsoleControl.ConsoleControl, TabPage> consoleTabMap;
-        public Dictionary<TabPage, ConsoleControl.ConsoleControl> tabConsoleMap;
+        public Dictionary<ConsoleControl.ConsoleProvider, TabPage> consoleTabMap;
+        public Dictionary<TabPage, ConsoleControl.ConsoleProvider> tabConsoleMap;
 
         public TabbedConsole(PluginMain plugin)
         {
             InitializeComponent();
 
             main = plugin;
-            consoleTabMap = new Dictionary<ConsoleControl.ConsoleControl, TabPage>();
-            tabConsoleMap = new Dictionary<TabPage, ConsoleControl.ConsoleControl>();
+            consoleTabMap = new Dictionary<ConsoleControl.ConsoleProvider, TabPage>();
+            tabConsoleMap = new Dictionary<TabPage, ConsoleControl.ConsoleProvider>();
 
             btnNew.Image = PluginCore.PluginBase.MainForm.FindImage16("33");
         }
 
-        public void AddConsole(ConsoleControl.ConsoleControl console)
+        public void AddConsole(ConsoleControl.ConsoleProvider console)
         {
+            if (!(console is Control))
+                throw new Exception("ConsoleControl needs to be a System.Windows.Forms.Control");
+
             var tabPage = new TabPage("Console");
-            console.Dock = DockStyle.Fill;
-            tabPage.Controls.Add(console);
+            
+            tabPage.Controls.Add((Control)console);
 
             tabConsoles.TabPages.Add(tabPage);
             tabConsoles.SelectTab(tabPage);
@@ -43,7 +46,7 @@ namespace ConsolePanel.Gui
             tabConsoleMap.Add(tabConsoles.SelectedTab, console);
         }
 
-        public void RemoveConsole(ConsoleControl.ConsoleControl console)
+        public void RemoveConsole(ConsoleControl.ConsoleProvider console)
         {
             if (consoleTabMap.ContainsKey(console))
             {
@@ -73,7 +76,7 @@ namespace ConsolePanel.Gui
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            main.CreateConsolePanel();
+            main.CreateConsolePanel(null);
         }
     }
 }

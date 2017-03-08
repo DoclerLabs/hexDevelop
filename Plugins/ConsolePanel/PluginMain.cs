@@ -26,6 +26,8 @@ namespace ConsolePanel
         private Gui.TabbedConsole tabView;
         private Image image;
 
+        private bool inited = false;
+
         public int Api
         {
             get
@@ -88,7 +90,7 @@ namespace ConsolePanel
             InitBasics();
             LoadSettings();
             CreatePluginPanel();
-            CreateConsolePanel();
+            //CreateConsolePanel(null);
             CreateMenuItem();
 
             EventManager.AddEventHandler(this, EventType.Command, HandlingPriority.Normal);
@@ -103,9 +105,18 @@ namespace ConsolePanel
                     if (data.Action == "ProjectManager.Project")
                     {
                         var project = (Project) data.Data;
-                        foreach (var panel in tabView.Consoles)
+                        
+                        if (!inited)
                         {
-                            panel.WorkingDirectory = PluginBase.CurrentProject.GetAbsolutePath("");
+                            CreateConsolePanel(null);
+                            inited = true;
+                        }
+                        else
+                        {
+                            foreach (var panel in tabView.Consoles)
+                            {
+                                panel.WorkingDirectory = PluginBase.CurrentProject.GetAbsolutePath("");
+                            }
                         }
                     }
                     break;
@@ -151,11 +162,11 @@ namespace ConsolePanel
             cmdPanelDockContent.Text = "Console";
         }
 
-        public ConsoleControl.ConsoleControl CreateConsolePanel()
+        public ConsoleControl.ConsoleProvider CreateConsolePanel(string cmd)
         {
             cmdPanelDockContent.Show();
 
-            var cmdPanel = new ConsoleControl.ConsoleControl("cmd", false);
+            var cmdPanel = new ConsoleControl.CmdControl("cmd", cmd != null ? "/c " + cmd : null, false);
             cmdPanel.Text = "Console";
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;
             cmdPanel.ConsoleForeColor = settingObject.ForegroundColor;
@@ -195,7 +206,7 @@ namespace ConsolePanel
 
         private void OpenCmdPanel(object sender, EventArgs e)
         {
-            CreateConsolePanel();
+            CreateConsolePanel(null);
             //cmdPanelDockContent.Show();
         }
     }
