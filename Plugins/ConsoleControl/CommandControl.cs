@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Windows.Automation;
+using System.Management;
 
 namespace ConsoleControl
 {
@@ -67,17 +68,31 @@ namespace ConsoleControl
                 if (!process.HasExited)
                 {
                     SendString("^(c)", false);
-                    try
-                    {
-                        //TODO: kill subprocesses
-                        process.Kill();
-                    }
-                    catch { }
 
+                    KillProcessAndChildren(process.Id);
                 }
 
                 process = null;
             }
+        }
+
+        private void KillProcessAndChildren(int id)
+        {
+            var search = new ManagementObjectSearcher("SELECT * FROM Win32_Process Where ParentProcessID=" + id);
+            foreach (var m in search.Get())
+            {
+                var childID = Convert.ToInt32(m["ProcessID"]);
+                KillProcessAndChildren(childID);
+            }
+
+            try
+            {
+                Process.GetProcessById(id).Kill();
+            }
+            catch
+            {
+            }
+            
         }
 
         /// <summary>
