@@ -15,7 +15,7 @@ namespace ConsolePanel
         private string minttyCmd = @"C:\Program Files\Git\usr\bin\mintty.exe";
         private string bashCmd = "-e \"/c/Program Files/Git/bin/bash\"";
 
-        [DisplayName("Background Color"), DefaultValue(ConsoleColor.Black)]
+        [Category("Cmd"), DisplayName("Background Color"), DefaultValue(ConsoleColor.Black)]
         public ConsoleColor BackgroundColor
         {
             get
@@ -28,7 +28,7 @@ namespace ConsolePanel
             }
         }
 
-        [DisplayName("Foreground Color"), DefaultValue(ConsoleColor.White)]
+        [Category("Cmd"), DisplayName("Foreground Color"), DefaultValue(ConsoleColor.White)]
         public ConsoleColor ForegroundColor
         {
             get
@@ -68,7 +68,7 @@ namespace ConsolePanel
             }
         }
 
-        [Category("Bash"), DisplayName("Arguments"), DefaultValue("-e \"/c/Program Files/Git/bin/bash\"")]
+        [Category("Bash"), DisplayName("Parameters"), DefaultValue("-e \"/c/Program Files/Git/bin/bash\"")]
         public string BashCommand
         {
             get

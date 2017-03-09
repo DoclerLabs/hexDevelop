@@ -198,7 +198,9 @@ namespace ConsolePanel
                 }
             };
 
-            cmdPanel.SendString(cmd);
+            if (cmd != null)
+                cmdPanel.SendString(cmd);
+            
             cmdPanel.Create();
 
             tabView.AddConsole(cmdPanel);

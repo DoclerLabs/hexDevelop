@@ -14,6 +14,25 @@ namespace ConsoleControl
     // "C:\Program Files\Git\bin\bash" -c "echo hi & bash"
     public partial class BashControl : CommandControl, ConsoleProvider
     {
+        static Dictionary<ConsoleColor, int> colors = new Dictionary<ConsoleColor, int>
+        {
+            { ConsoleColor.Black, 30 },
+            { ConsoleColor.Blue, 94 },
+            { ConsoleColor.Cyan, 96 },
+            { ConsoleColor.DarkBlue, 34 },
+            { ConsoleColor.DarkCyan, 36 },
+            { ConsoleColor.DarkGray, 90 },
+            { ConsoleColor.DarkGreen, 32 },
+            { ConsoleColor.DarkMagenta, 35 },
+            { ConsoleColor.DarkRed, 31 },
+            { ConsoleColor.DarkYellow, 33 },
+            { ConsoleColor.Gray, 37 },
+            { ConsoleColor.Green, 92 },
+            { ConsoleColor.Magenta, 95 },
+            { ConsoleColor.Red, 91 },
+            { ConsoleColor.White, 97 },
+            { ConsoleColor.Yellow, 93 }
+        };
 
         ConsoleColor backColor = ConsoleColor.Black;
         ConsoleColor foreColor = ConsoleColor.White;
@@ -29,6 +48,7 @@ namespace ConsoleControl
                 Create();
         }
 
+        //Colors ignored for now
         public ConsoleColor ConsoleBackColor
         {
             get
@@ -38,7 +58,7 @@ namespace ConsoleControl
 
             set
             {
-                //throw new NotImplementedException();
+                backColor = value;
             }
         }
 
@@ -50,7 +70,7 @@ namespace ConsoleControl
             }
             set
             {
-                //throw new NotImplementedException();
+                foreColor = value;
             }
         }
 
