@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ConsoleControl
 {
-    public interface ConsoleProvider : System.Windows.Forms.IContainerControl
+    public interface IConsoleProvider : System.Windows.Forms.IContainerControl
     {
         ConsoleColor ConsoleBackColor
         {

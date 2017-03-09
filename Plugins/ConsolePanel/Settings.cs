@@ -12,7 +12,7 @@ namespace ConsolePanel
         private ConsoleColor foreground = ConsoleColor.White;
 
         private TerminalProvider provider = TerminalProvider.Bash;
-        private string minttyCmd = @"C:\Program Files\Git\usr\bin\mintty.exe";
+        private string minttyCmd = @"%PROGRAMFILES%\Git\usr\bin\mintty.exe";
         private string bashCmd = "-e \"/c/Program Files/Git/bin/bash\"";
 
         [Category("Cmd"), DisplayName("Background Color"), DefaultValue(ConsoleColor.Black)]
@@ -54,7 +54,7 @@ namespace ConsolePanel
             }
         }
 
-        [Category("Bash"), DisplayName("Command"), DefaultValue(@"C:\Program Files\Git\usr\bin\mintty.exe")]
+        [Category("Bash"), DisplayName("Command"), DefaultValue(@"%PROGRAMFILES%\Git\usr\bin\mintty.exe")]
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         public string MinttyCommand
         {
@@ -84,7 +84,7 @@ namespace ConsolePanel
 
     enum TerminalProvider
     {
-        Cmd,
-        Bash
+        Bash,
+        Cmd
     }
 }

@@ -7,7 +7,7 @@ using System.Windows.Automation;
 
 namespace ConsoleControl
 {
-    public partial class CmdControl : CommandControl, ConsoleProvider
+    public partial class CmdControl : CommandControl, IConsoleProvider
     {
         ConsoleColor backColor = ConsoleColor.Black;
         ConsoleColor foreColor = ConsoleColor.White;

@@ -11,8 +11,7 @@ using System.Windows.Automation;
 
 namespace ConsoleControl
 {
-    // "C:\Program Files\Git\bin\bash" -c "echo hi & bash"
-    public partial class BashControl : CommandControl, ConsoleProvider
+    public partial class BashControl : CommandControl, IConsoleProvider
     {
         static Dictionary<ConsoleColor, int> colors = new Dictionary<ConsoleColor, int>
         {

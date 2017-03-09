@@ -162,12 +162,12 @@ namespace ConsolePanel
             cmdPanelDockContent.Text = "Console";
         }
 
-        public ConsoleControl.ConsoleProvider CreateConsolePanel(string cmd)
+        public ConsoleControl.IConsoleProvider CreateConsolePanel(string cmd)
         {
             cmdPanelDockContent.Show();
 
-            ConsoleControl.ConsoleProvider cmdPanel;
-            var useBash = settingObject.TerminalProvider == TerminalProvider.Bash; 
+            ConsoleControl.IConsoleProvider cmdPanel;
+            var useBash = settingObject.TerminalProvider == TerminalProvider.Bash;
             if (useBash && File.Exists(settingObject.MinttyCommand))
             {
                 cmdPanel = new ConsoleControl.BashControl(settingObject.MinttyCommand, settingObject.BashCommand, false);

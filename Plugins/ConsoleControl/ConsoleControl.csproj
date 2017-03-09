@@ -51,7 +51,7 @@
     <Compile Include="CommandControl.Designer.cs">
       <DependentUpon>CommandControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConsoleProvider.cs" />
+    <Compile Include="IConsoleProvider.cs" />
     <Compile Include="CmdControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
