@@ -32,11 +32,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="UIAutomationClient" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BashControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BashControl.Designer.cs">
+      <DependentUpon>BashControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommandControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CommandControl.Designer.cs">
+      <DependentUpon>CommandControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConsoleProvider.cs" />
     <Compile Include="CmdControl.cs">
       <SubType>UserControl</SubType>

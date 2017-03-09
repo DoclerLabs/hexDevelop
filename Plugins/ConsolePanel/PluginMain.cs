@@ -166,8 +166,18 @@ namespace ConsolePanel
         {
             cmdPanelDockContent.Show();
 
-            var cmdPanel = new ConsoleControl.CmdControl(false);
-            cmdPanel.Text = "Console";
+            ConsoleControl.ConsoleProvider cmdPanel;
+            var useBash = settingObject.TerminalProvider == TerminalProvider.Bash; 
+            if (useBash && File.Exists(settingObject.MinttyCommand))
+            {
+                cmdPanel = new ConsoleControl.BashControl(settingObject.MinttyCommand, settingObject.BashCommand, false);
+            }
+            else
+            {
+                if (useBash)
+                    TraceManager.Add("Could not find mintty, using cmd instead of bash", (int)TraceType.Warning);
+                cmdPanel = new ConsoleControl.CmdControl(false);
+            }
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;
             cmdPanel.ConsoleForeColor = settingObject.ForegroundColor;
 

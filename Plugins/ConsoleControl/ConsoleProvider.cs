@@ -27,6 +27,7 @@ namespace ConsoleControl
         event EventHandler Exited;
 
         void Cancel();
+        void Create();
         void SendString(string str, bool execute = true);
 
     }
