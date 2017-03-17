@@ -175,7 +175,7 @@ namespace ConsolePanel
             else
             {
                 if (useBash)
-                    TraceManager.Add("Could not find mintty, using cmd instead of bash", (int)TraceType.Warning);
+                    TraceManager.Add("Could not run mintty, please check the path in the ConsolePanel settings", (int)TraceType.Warning);
                 cmdPanel = new ConsoleControl.CmdControl(false);
             }
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;

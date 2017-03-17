@@ -12,8 +12,8 @@ namespace ConsolePanel
         private ConsoleColor foreground = ConsoleColor.White;
 
         private TerminalProvider provider = TerminalProvider.Bash;
-        private string minttyCmd = @"C:\Program Files\Git\usr\bin\mintty.exe";
-        private string bashCmd = "-e \"/c/Program Files/Git/bin/bash\"";
+        private string minttyCmd = "";
+        private string bashCmd = "-e \"\"";
 
         [Category("Cmd"), DisplayName("Background Color"), DefaultValue(ConsoleColor.Black)]
         public ConsoleColor BackgroundColor
@@ -54,7 +54,9 @@ namespace ConsolePanel
             }
         }
 
-        [Category("Bash"), DisplayName("Command"), DefaultValue(@"C:\Program Files\Git\usr\bin\mintty.exe")]
+        [Category("Bash"),
+            Description("The path to your mintty.exe\nExample: C:\\Program Files\\Git\\usr\\bin\\mintty.exe"),
+            DisplayName("Command")]
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         public string MinttyCommand
         {
@@ -68,7 +70,10 @@ namespace ConsolePanel
             }
         }
 
-        [Category("Bash"), DisplayName("Parameters"), DefaultValue("-e \"/c/Program Files/Git/bin/bash\"")]
+        [Category("Bash"),
+            Description("The parameter to pass to mintty. It contains the path to bash in posix path format.\nExample: -e \"/c/Program Files/Git/bin/bash\""),
+            DisplayName("Parameters"),
+            DefaultValue("-e \"\"")]
         public string BashCommand
         {
             get
