@@ -21,9 +21,9 @@ namespace EditorConfig
     {
         private String pluginName = "EditorConfig";
         private String pluginGuid = "0158C50F-6FC7-45F3-BACA-F3C0F1242CEF";
-        private String pluginHelp = "www.flashdevelop.org/community/";
-        private String pluginDesc = "Adds a results panel for console info to FlashDevelop";
-        private String pluginAuth = "FlashDevelop Team";
+        private String pluginHelp = "http://hexmachina.org/";
+        private String pluginDesc = "Reads and applies .editorconfig files";
+        private String pluginAuth = "Christoph Otter";
 
         private EditorConfigParser parser;
         private Project lastProject;
