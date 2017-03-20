@@ -1,10 +1,10 @@
 # hexDevelop
 
-##Installation
+## Installation
 The plugins should work fine with FlashDevelop and HaxeDevelop.
 Just download the package from the releases tab and open it using FlashDevelop. Then just restart FlashDevelop and you are done.
 
-##Plugins
+## Plugins
 
 ### DSLCompletion
 Auto-completion for hexMachina DSL.
