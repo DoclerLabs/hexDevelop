@@ -1,0 +1,49 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v3.5": {
+      "Theraot.Core/1.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/NET35/Theraot.Core.dll": {}
+        },
+        "runtime": {
+          "lib/NET35/Theraot.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v3.5/win": {
+      "Theraot.Core/1.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/NET35/Theraot.Core.dll": {}
+        },
+        "runtime": {
+          "lib/NET35/Theraot.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Theraot.Core/1.0.2": {
+      "sha512": "OLF4SXSA5BSaUg3bSQqmiKQGaNMnHkbevyKkKjp9NST9x/80rNUY2wcGyGsUgBh9QLxEYS6xtMp229ZTwcVB/w==",
+      "type": "package",
+      "files": [
+        "Theraot.Core.1.0.2.nupkg.sha512",
+        "Theraot.Core.nuspec",
+        "lib/NET20/Theraot.Core.dll",
+        "lib/NET30/Theraot.Core.dll",
+        "lib/NET35/Theraot.Core.dll",
+        "lib/NET40/Theraot.Core.dll",
+        "lib/NET45/Theraot.Core.dll"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "Theraot.Core >= 1.0.2"
+    ],
+    ".NETFramework,Version=v3.5": []
+  }
+}
