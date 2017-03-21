@@ -87,7 +87,7 @@ namespace EditorConfig
         /// </summary>
         public Object Settings
         {
-            get { return new object(); }
+            get { return null; }
         }
         
         #endregion
@@ -99,7 +99,6 @@ namespace EditorConfig
         /// </summary>
         public void Initialize()
         {
-            this.InitBasics();
             this.AddEventHandlers();
         }
 
@@ -167,19 +166,6 @@ namespace EditorConfig
         #endregion
 
         #region Custom Methods
-
-        /// <summary>
-        /// Initializes important variables
-        /// </summary>
-        public void InitBasics()
-        {
-            //String dataDir = Path.Combine(PathHelper.DataDir, "EditorConfig");
-            //if (!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
-
-            //this.pluginDesc = TextHelper.GetString("Info.Description");
-        }
-
-
         /// <summary>
         /// Processes the cached open files.
         /// In this case, cached means that these files were just opened, but OnOpenFile was not called yet.
@@ -211,7 +197,6 @@ namespace EditorConfig
         {
             EventType eventMask = EventType.FileOpen | EventType.FileEncode | EventType.Command;
             EventManager.AddEventHandler(this, eventMask);
-            //UITools.Manager.OnCharAdded += new UITools.CharAddedHandler(OnChar);
         }
 
         /// <summary>
@@ -219,8 +204,6 @@ namespace EditorConfig
         /// </summary>
         private FileConfiguration GetConfig(string filename)
         {
-            //var fullFile = PluginBase.CurrentProject.GetAbsolutePath(filename);
-
             return parser.Parse(filename).First();
         }
 
@@ -306,7 +289,6 @@ namespace EditorConfig
 
         private void ApplyFinalNewLine(ScintillaControl sci, FileConfiguration config)
         {
-            //TODO: final new line
             if (config.InsertFinalNewline == true)
             {
                 sci.AddLastLineEnd();
