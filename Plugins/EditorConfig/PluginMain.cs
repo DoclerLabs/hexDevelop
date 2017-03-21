@@ -125,8 +125,7 @@ namespace EditorConfig
 
                         if (lastProject != project)
                         {
-                            //look for .editorconfig
-                            LoadConfig();
+                            parser = new EditorConfigParser();
                             ProcessCache();
 
                             lastProject = project;
@@ -180,18 +179,6 @@ namespace EditorConfig
             //this.pluginDesc = TextHelper.GetString("Info.Description");
         }
 
-        /// <summary>
-        /// Looks for a .editorconfig file and loads it.
-        /// </summary>
-        private void LoadConfig()
-        {
-            string file = PluginBase.CurrentProject.GetAbsolutePath(".editorconfig");
-            
-            if (File.Exists(file))
-            {
-                parser = new EditorConfigParser(file);
-            }
-        }
 
         /// <summary>
         /// Processes the cached open files.
