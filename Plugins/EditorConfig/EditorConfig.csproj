@@ -45,11 +45,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Charset.cs" />
+    <Compile Include="Core\EditorConfigFile.cs" />
+    <Compile Include="Core\EditorConfigParser.cs" />
+    <Compile Include="Core\EndOfLine.cs" />
+    <Compile Include="Core\FileConfiguration.cs" />
+    <Compile Include="Core\IndentSize.cs" />
+    <Compile Include="Core\IndentStyle.cs" />
+    <Compile Include="Core\Minimatcher.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Core\LICENSE" />
+    <None Include="Core\sign.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -61,14 +71,11 @@
       <Project>{78101C01-E186-4954-B1DD-DEBB7905FAD8}</Project>
       <Name>ProjectManager</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\EditorConfig.Core\EditorConfig.Core.csproj">
-      <Project>{c33cf791-89d0-4abe-b2b7-97e1f46a1319}</Project>
-      <Name>EditorConfig.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
