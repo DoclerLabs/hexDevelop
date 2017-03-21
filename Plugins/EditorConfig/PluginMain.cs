@@ -214,41 +214,6 @@ namespace EditorConfig
             //UITools.Manager.OnCharAdded += new UITools.CharAddedHandler(OnChar);
         }
 
-        /** 
-         * Max line length implementation
-         * Currently not used, because it cannot handle copy & paste and possibly other edge cases
-         */
-        //private void OnChar(ScintillaControl sender, int value)
-        //{
-        //    try
-        //    {
-        //        var currentDoc = PluginBase.MainForm.CurrentDocument;
-        //        var config = GetConfig(currentDoc.FileName);
-        //        if (config.MaxLineLength != null)
-        //        {
-        //            var len = currentDoc.SciControl.GetLine(currentDoc.SciControl.CurrentLine).Length;
-        //            if (len > config.MaxLineLength)
-        //            {
-        //                string eol = "\n";
-        //                switch (currentDoc.SciControl.EndOfLineMode)
-        //                {
-        //                    case ScintillaNet.Enums.EndOfLine.CR:
-        //                        eol = "\r";
-        //                        break;
-        //                    case ScintillaNet.Enums.EndOfLine.CRLF:
-        //                        eol = "\r\n";
-        //                        break;
-        //                }
-
-        //                var pos = currentDoc.SciControl.PositionBefore(currentDoc.SciControl.CurrentPos);
-        //                currentDoc.SciControl.InsertText(pos, eol);
-        //            }
-        //        }
-        //    }
-        //    catch { }
-        //    //check line length
-        //}
-
         /// <summary>
         /// Gets the .editorconfig properties that apply to the given file
         /// </summary>
@@ -332,7 +297,11 @@ namespace EditorConfig
 
         private void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
         {
-            //TODO: config.MaxLineLength;
+            if (config.MaxLineLength != null)
+            {
+                sci.EdgeMode = (int)ScintillaNet.Enums.EdgeVisualStyle.Line;
+                sci.EdgeColumn = (int)config.MaxLineLength;
+            }
         }
 
         private void ApplyFinalNewLine(ScintillaControl sci, FileConfiguration config)
