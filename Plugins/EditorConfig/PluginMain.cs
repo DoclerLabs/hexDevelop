@@ -282,6 +282,7 @@ namespace EditorConfig
         {
             if (config.MaxLineLength != null)
             {
+                //This might be problematic if there already is an edge defined. In that case, it is overridden
                 sci.EdgeMode = (int)ScintillaNet.Enums.EdgeVisualStyle.Line;
                 sci.EdgeColumn = (int)config.MaxLineLength;
             }
