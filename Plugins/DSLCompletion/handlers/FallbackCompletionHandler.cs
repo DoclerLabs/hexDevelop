@@ -2,6 +2,7 @@
 using ProjectManager.Projects.Haxe;
 using System.IO;
 using System.Collections.Generic;
+using ASCompletion.Model;
 
 namespace DSLCompletion
 {
@@ -32,12 +33,9 @@ namespace DSLCompletion
             haxeContext.CurrentFile = null;
             #endregion
             //Try to find class with given name
-            var split = new List<string>(type.Split('.'));
-            var clazz = split[split.Count - 1];
-            split.RemoveAt(split.Count - 1);
-            var package = string.Join(".", split.ToArray());
+            var clazz = SplitAtLastDot(type);
 
-            var classModel = haxeContext.GetModel(package, clazz, "");
+            var classModel = haxeContext.GetModel(clazz[0], clazz[1], "");
             if (classModel.InFile != null && classModel.InFile.FileName != "")
             {
                 callback(new PositionResult(classModel.InFile.FileName, classModel.LineFrom, true));
@@ -45,12 +43,10 @@ namespace DSLCompletion
             }
 
             //Found no class, look for field in class
-            var field = clazz;
-            clazz = split[split.Count - 1];
-            split.RemoveAt(split.Count - 1);
-            package = string.Join(".", split.ToArray());
-
-            classModel = haxeContext.GetModel(package, clazz, "");
+            var field = clazz[1];
+            clazz = SplitAtLastDot(clazz[0]);
+            
+            classModel = haxeContext.GetModel(clazz[0], clazz[1], "");
             var members = classModel.Members;
             foreach (ASCompletion.Model.MemberModel member in members)
             {
@@ -114,15 +110,30 @@ namespace DSLCompletion
             haxeContext.CurrentFile = null;
             #endregion
 
+            //Look for classes
+            string[] clazz = SplitAtLastDot(path);
+
             foreach (var model in classes.Items)
             {
-                if (model.Name.StartsWith(path))
+                if (model.Name.Equals(clazz[0])) //this means we are looking for variables within a class
+                {
+                    var cls = SplitAtLastDot(clazz[0]);
+                    var classModel = haxeContext.GetModel(cls[0], cls[1], "");
+                    foreach (MemberModel member in classModel.Members.Items)
+                    {
+                        if (member.Name.StartsWithOrdinal(clazz[1])) //clazz[1] is the variable name in this case
+                        {
+                            list.Add(member.Name);
+                        }
+                    }
+                }
+                else if (model.Name.StartsWith(path))
                 {
                     var completion = model.Name.Substring(path.Length);
-                    var split = completion.Split('.');
+                    var splt = completion.Split('.');
 
-                    if (!list.Contains(split[0]))
-                        list.Add(split[0]);
+                    if (!list.Contains(splt[0]))
+                        list.Add(splt[0]);
                 }
             }
 
@@ -166,6 +177,20 @@ namespace DSLCompletion
             //if (results.Count == 0) return;
 
             callback(results);
+        }
+
+        /// <summary>
+        /// Splits at the last '.' character.
+        /// Example: SplitClassFromPackage("example.test.Main") becomes ["example.test", "Main"]
+        /// </summary>
+        private string[] SplitAtLastDot(string path)
+        {
+            var split = new List<string>(path.Split('.'));
+            var clazz = split[split.Count - 1];
+            split.RemoveAt(split.Count - 1);
+            var package = string.Join(".", split.ToArray());
+
+            return new string[] { package, clazz };
         }
     }
 }
