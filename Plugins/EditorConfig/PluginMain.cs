@@ -209,7 +209,6 @@ namespace EditorConfig
 
         private void OnOpenFile(ITabbedDocument document)
         {
-            TraceManager.Add(document.FileName);
             var sci = document.SciControl;
             var config = GetConfig(document.FileName);
 
@@ -274,7 +273,10 @@ namespace EditorConfig
             sci.TabWidth = config.TabWidth ?? sci.TabWidth;
 
             //indent size
-            sci.Indent = config.IndentSize.NumberOfColumns ?? sci.Indent;
+            if (config.IndentSize != null)
+            {
+                sci.Indent = config.IndentSize.NumberOfColumns ?? sci.Indent;
+            }
 
         }
 
