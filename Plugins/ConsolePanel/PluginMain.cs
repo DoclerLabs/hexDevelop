@@ -26,6 +26,8 @@ namespace ConsolePanel
         private Gui.TabbedConsole tabView;
         private Image image;
 
+        private bool inited = false;
+
         public int Api
         {
             get
@@ -88,7 +90,7 @@ namespace ConsolePanel
             InitBasics();
             LoadSettings();
             CreatePluginPanel();
-            CreateConsolePanel();
+            //CreateConsolePanel(null);
             CreateMenuItem();
 
             EventManager.AddEventHandler(this, EventType.Command, HandlingPriority.Normal);
@@ -103,9 +105,18 @@ namespace ConsolePanel
                     if (data.Action == "ProjectManager.Project")
                     {
                         var project = (Project) data.Data;
-                        foreach (var panel in tabView.Consoles)
+                        
+                        if (!inited)
                         {
-                            panel.WorkingDirectory = PluginBase.CurrentProject.GetAbsolutePath("");
+                            CreateConsolePanel(null);
+                            inited = true;
+                        }
+                        else
+                        {
+                            foreach (var panel in tabView.Consoles)
+                            {
+                                panel.WorkingDirectory = PluginBase.CurrentProject.GetAbsolutePath("");
+                            }
                         }
                     }
                     break;
@@ -151,12 +162,22 @@ namespace ConsolePanel
             cmdPanelDockContent.Text = "Console";
         }
 
-        public ConsoleControl.ConsoleControl CreateConsolePanel()
+        public ConsoleControl.IConsoleProvider CreateConsolePanel(string cmd)
         {
             cmdPanelDockContent.Show();
 
-            var cmdPanel = new ConsoleControl.ConsoleControl("cmd", false);
-            cmdPanel.Text = "Console";
+            ConsoleControl.IConsoleProvider cmdPanel;
+            var useBash = settingObject.TerminalProvider == TerminalProvider.Bash;
+            if (useBash && File.Exists(settingObject.MinttyCommand))
+            {
+                cmdPanel = new ConsoleControl.BashControl(settingObject.MinttyCommand, settingObject.BashCommand, false);
+            }
+            else
+            {
+                if (useBash)
+                    TraceManager.Add("Could not run mintty, please check the path in the ConsolePanel settings", (int)TraceType.Warning);
+                cmdPanel = new ConsoleControl.CmdControl(false);
+            }
             cmdPanel.ConsoleBackColor = settingObject.BackgroundColor;
             cmdPanel.ConsoleForeColor = settingObject.ForegroundColor;
 
@@ -177,6 +198,9 @@ namespace ConsolePanel
                 }
             };
 
+            if (cmd != null)
+                cmdPanel.SendString(cmd);
+            
             cmdPanel.Create();
 
             tabView.AddConsole(cmdPanel);
@@ -195,7 +219,7 @@ namespace ConsolePanel
 
         private void OpenCmdPanel(object sender, EventArgs e)
         {
-            CreateConsolePanel();
+            CreateConsolePanel(null);
             //cmdPanelDockContent.Show();
         }
     }
