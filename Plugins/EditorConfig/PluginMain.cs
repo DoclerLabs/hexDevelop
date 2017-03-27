@@ -273,11 +273,7 @@ namespace EditorConfig
             sci.TabWidth = config.TabWidth ?? sci.TabWidth;
 
             //indent size
-            if (config.IndentSize != null)
-            {
-                sci.Indent = config.IndentSize.NumberOfColumns ?? sci.Indent;
-            }
-
+            if (config.IndentSize?.NumberOfColumns != null) sci.Indent = (int)config.IndentSize.NumberOfColumns;
         }
 
         private void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
