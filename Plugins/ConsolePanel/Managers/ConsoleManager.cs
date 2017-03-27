@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ConsolePanel.Managers
 {
@@ -23,10 +20,10 @@ namespace ConsolePanel.Managers
             {
                 while(commandList.Count > 0)
                 {
-                    main.CreateConsolePanel().SendString(commandList[0]);
+                    main.CreateConsolePanel(commandList[0]);
                     commandList.RemoveAt(0);
                 }
-                main.CreateConsolePanel().SendString(command);
+                main.CreateConsolePanel(command);
             }
             else
             {

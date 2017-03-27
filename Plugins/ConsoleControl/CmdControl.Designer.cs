@@ -1,6 +1,6 @@
 ﻿namespace ConsoleControl
 {
-    partial class ConsoleControl
+    partial class CmdControl
     {
         /// <summary> 
         /// Required designer variable.
