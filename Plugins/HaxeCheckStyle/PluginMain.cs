@@ -81,24 +81,15 @@ namespace HaxeCheckStyle
             LoadSettings();
 
             LintingHelper.Managers.LintingManager.RegisterLinter("haxe", new CheckStyleLinter());
-
-            EventManager.AddEventHandler(this, EventType.FileOpen | EventType.FileSave, HandlingPriority.Normal);
-        }
-
-        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
-        {
-            switch(e.Type)
-            {
-                case EventType.FileOpen:
-                    TextEvent fileOpen = (TextEvent)e;
-                    //new CodeRefactor.Commands.HaxeCheckSyntaxCommand(new string[] { fileOpen.Value }).Execute();
-                    break;
-            }
         }
 
         public void Dispose()
         {
             SaveSettings();
+        }
+
+        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
+        {
         }
 
         private void InitBasics()
