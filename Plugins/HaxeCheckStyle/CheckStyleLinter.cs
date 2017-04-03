@@ -27,6 +27,7 @@ namespace HaxeCheckStyle
         {
             try
             {
+                //TODO: do something about too long command line
                 string command = "$(CompilerPath)\\haxelib.exe";
                 string args = "run checkstyle";
                 foreach (string file in files)
