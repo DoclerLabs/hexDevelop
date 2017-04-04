@@ -80,7 +80,7 @@ namespace HaxeCheckStyle
             InitBasics();
             LoadSettings();
 
-            LintingHelper.Managers.LintingManager.RegisterLinter("haxe", new CheckStyleLinter());
+            LintingHelper.Managers.LintingManager.RegisterLinter("haxe", new CheckStyleLinter(settingObject));
         }
 
         public void Dispose()

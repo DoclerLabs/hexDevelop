@@ -1,5 +1,6 @@
 ﻿using LintingHelper;
 using PluginCore;
+using PluginCore.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,9 @@ namespace HaxeCheckStyle
 {
     class CheckStyleLinter : ILintProvider
     {
+        private const int MaxArgLength = 2000;
+
+        private Settings settings;
         /**
         * Match checkstyle entry
         * i.e.  src/Test.hx:11: characters 1-2 : Info: Empty block should be written as "{}"
@@ -19,57 +23,54 @@ namespace HaxeCheckStyle
         */
         private Regex fileEntry = new Regex(@"^(?<filename>([_A-Za-z]:)?[^:*?]+):(?<line>[0-9]+): characters? (?<chars>[0-9]+(\-[0-9]+)?) : (?<type>[^:]*): (?<description>.*)$", RegexOptions.Compiled);
 
-        public CheckStyleLinter()
+        public CheckStyleLinter(Settings settings)
         {
+            this.settings = settings;
         }
 
-        public void DoLintAsync(string[] files, LintCallback callback)
+        public void LintAsync(string[] files, LintCallback callback)
         {
             try
             {
-                //TODO: do something about too long command line
+                var list = new List<LintingResult>();
+
+                ProcessRunner p = new ProcessRunner();
+                Action<object, string> output = (sender, line) =>
+                {
+                    var result = ParseLine(line);
+                    if (result != null)
+                    {
+                        list.Add(result);
+                    }
+                };
+                Action<object, int> ended = (sender, exitCode) =>
+                {
+                    callback(list);
+                };
+                p.Output += new LineOutputHandler(output);
+                p.Error += new LineOutputHandler(output);
+                p.ProcessEnded += new ProcessEndedHandler(ended);
+
+                if (PluginBase.CurrentProject != null)
+                {
+                    p.WorkingDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
+                }
+
                 string command = "$(CompilerPath)\\haxelib.exe";
+                command = PluginBase.MainForm.ProcessArgString(command);
                 string args = "run checkstyle";
+
                 foreach (string file in files)
                 {
                     args += " -s \"" + file + "\"";
                 }
-                command = PluginBase.MainForm.ProcessArgString(command);
 
-                Process p = new Process();
-                p.StartInfo.FileName = command;
-                p.StartInfo.Arguments = args;
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.RedirectStandardError = true;
-
-                p.Start();
-
-                var list = new List<LintingResult>();
-                while (!p.StandardOutput.EndOfStream)
+                if (settings.PreferGlobalSettings && !string.IsNullOrEmpty(settings.CustomSettingsFile))
                 {
-                    var line = p.StandardOutput.ReadLine();
-                    var result = ParseLine(line);
-                    if (result != null)
-                    {
-                        list.Add(result);
-                    }
+                    args += " -c \"" + settings.CustomSettingsFile + "\"";
                 }
-                while (!p.StandardError.EndOfStream)
-                {
-                    var line = p.StandardError.ReadLine();
-                    var result = ParseLine(line);
-                    if (result != null)
-                    {
-                        list.Add(result);
-                    }
-                }
-                p.WaitForExit();
-                //PluginBase.MainForm.CallCommand("RunProcessCaptured", command);
 
-                callback(list);
+                p.Run(command, args);
             }
             catch {
                 callback(null);
