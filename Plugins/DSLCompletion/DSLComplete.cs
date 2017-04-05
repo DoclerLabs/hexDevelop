@@ -300,6 +300,9 @@ namespace DSLCompletion
                 }
             }
 
+            if (sci.GetTextRange(left - 1, left) != "\"")
+                return null;
+
             try
             {
                 var selection = sci.GetTextRange(left, right + 1);
