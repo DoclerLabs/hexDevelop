@@ -255,7 +255,8 @@ namespace DSLCompletion
             
             var text = sci.GetLine(sci.CurrentLine);
 
-            if (!text.Contains("\"")) return null;
+            var style = sci.BaseStyleAt(sci.CurrentPos);
+            if (style != 6 && style != 7) return null;
 
             var lineStart = sci.PositionFromLine(sci.CurrentLine);
             var lineEnd = lineStart + sci.LineLength(sci.CurrentLine);
@@ -307,7 +308,7 @@ namespace DSLCompletion
             {
                 var selection = sci.GetTextRange(left, right + 1);
                 return selection;
-            } catch (Exception e) { return null; }
+            } catch { return null; }
             
         }
 
