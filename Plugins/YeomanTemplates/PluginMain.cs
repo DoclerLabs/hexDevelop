@@ -172,6 +172,8 @@ namespace YeomanTemplates
             var generators = YoHelper.GetYoGenerators(GetYoCommand());
             var icon = Properties.Resources.yeoman.ToBitmap();
 
+            if (generators == null) return;
+
             foreach (var parent in generators)
             {
                 var item = new ToolStripMenuItem(parent.Value);
