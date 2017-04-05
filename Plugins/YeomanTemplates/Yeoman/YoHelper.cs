@@ -1,4 +1,5 @@
-﻿using ProjectManager.Projects;
+﻿using PluginCore;
+using ProjectManager.Projects;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -25,9 +26,9 @@ namespace YeomanTemplates.yeoman
 
                 return parser.Result;
             }
-            catch (Exception e)
+            catch
             {
-                PluginCore.Managers.ErrorManager.ShowError("Error running yo, please check if the command in the settings is correct: " + yoCmd, e);
+                PluginCore.Managers.TraceManager.Add("Error running yo, please check if the command in the settings is correct: " + yoCmd, (int)TraceType.Error);
             }
 
             return null;
