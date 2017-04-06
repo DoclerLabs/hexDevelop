@@ -13,15 +13,13 @@ namespace HaxeCheckStyle
 {
     class CheckStyleLinter : ILintProvider
     {
-        private const int MaxArgLength = 2000;
-
         private Settings settings;
         /**
         * Match checkstyle entry
         * i.e.  src/Test.hx:11: characters 1-2 : Info: Empty block should be written as "{}"
         * or    src/Test.hx:14: character 1 : Info: Trailing whitespace
         */
-        private Regex fileEntry = new Regex(@"^(?<filename>([_A-Za-z]:)?[^:*?]+):(?<line>[0-9]+): characters? (?<chars>[0-9]+(\-[0-9]+)?) : (?<type>[^:]*): (?<description>.*)$", RegexOptions.Compiled);
+        private readonly Regex fileEntry = new Regex(@"^(?<filename>([_A-Za-z]:)?[^:*?]+):(?<line>[0-9]+): characters? (?<chars>[0-9]+(\-[0-9]+)?) : (?<type>[^:]*): (?<description>.*)$", RegexOptions.Compiled);
 
         public CheckStyleLinter(Settings settings)
         {
