@@ -56,10 +56,6 @@
       <Project>{5b4e9515-994a-4da7-9916-cda8fd874701}</Project>
       <Name>HaXeContext</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\External\Plugins\LintingHelper\LintingHelper.csproj">
-      <Project>{8b5a1c53-af20-4379-a8d1-31822acc6ad8}</Project>
-      <Name>LintingHelper</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\External\Plugins\ProjectManager\ProjectManager.csproj">
       <Project>{78101C01-E186-4954-B1DD-DEBB7905FAD8}</Project>
       <Name>ProjectManager</Name>
