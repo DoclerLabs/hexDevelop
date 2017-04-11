@@ -36,10 +36,6 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckStyleLinter.cs" />
@@ -48,17 +44,9 @@
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\External\Plugins\CodeRefactor\CodeRefactor.csproj">
-      <Project>{1F6DF858-6011-4CAC-B33E-7000EE90FFBE}</Project>
-      <Name>CodeRefactor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\External\Plugins\HaXeContext\HaXeContext.csproj">
-      <Project>{5b4e9515-994a-4da7-9916-cda8fd874701}</Project>
-      <Name>HaXeContext</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\External\Plugins\ProjectManager\ProjectManager.csproj">
-      <Project>{78101C01-E186-4954-B1DD-DEBB7905FAD8}</Project>
-      <Name>ProjectManager</Name>
+    <ProjectReference Include="..\..\..\External\Plugins\LintingHelper\LintingHelper.csproj">
+      <Project>{8B5A1C53-AF20-4379-A8D1-31822ACC6AD8}</Project>
+      <Name>LintingHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PluginCore\PluginCore.csproj">
       <Project>{61885F70-B4DC-4B44-852D-5D6D03F2A734}</Project>
