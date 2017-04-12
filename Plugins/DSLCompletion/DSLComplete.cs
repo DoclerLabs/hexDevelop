@@ -10,6 +10,7 @@ using System.Drawing;
 using PluginCore.Controls;
 using ASCompletion.Context;
 using ASCompletion;
+using ScintillaNet.Lexers;
 using XMLCompletion;
 
 namespace DSLCompletion
@@ -255,7 +256,8 @@ namespace DSLCompletion
             
             var text = sci.GetLine(sci.CurrentLine);
 
-            if (!text.Contains("\"")) return null;
+            var style = sci.BaseStyleAt(sci.CurrentPos);
+            if (style != (int)XML.SINGLESTRING && style != (int)XML.DOUBLESTRING) return null;
 
             var lineStart = sci.PositionFromLine(sci.CurrentLine);
             var lineEnd = lineStart + sci.LineLength(sci.CurrentLine);
@@ -304,7 +306,7 @@ namespace DSLCompletion
             {
                 var selection = sci.GetTextRange(left, right + 1);
                 return selection;
-            } catch (Exception e) { return null; }
+            } catch { return null; }
             
         }
 
