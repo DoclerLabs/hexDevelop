@@ -304,10 +304,29 @@ namespace DSLCompletion
 
             try
             {
-                var selection = sci.GetTextRange(left, right + 1);
+                var selection = GetTextRange(sci, left, right + 1);
                 return selection;
             } catch { return null; }
             
+        }
+
+        /// <summary>
+        /// This is copied here for backwards compatibility with FlashDevelop 5.2 and below
+        /// </summary>
+        unsafe private string GetTextRange(ScintillaControl sci, int position, int end)
+        {
+            int length = end - position;
+            var bytes = new byte[length + 1];
+            fixed (byte* bp = bytes)
+            {
+                TextRange* range = stackalloc TextRange[1];
+                range->chrg.cpMin = position;
+                range->chrg.cpMax = end;
+                range->lpstrText = new IntPtr(bp);
+
+                sci.SPerform(2162 /*SCI_GETTEXTRANGE*/, 0, new IntPtr(range));
+                return new string((sbyte*)bp, 0, length, sci.Encoding);
+            }
         }
 
         /// <summary>
