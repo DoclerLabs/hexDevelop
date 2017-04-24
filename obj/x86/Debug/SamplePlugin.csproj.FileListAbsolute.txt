@@ -1,0 +1,8 @@
+C:\Users\evasi\Documents\flashdevelop\FlashDevelop\Bin\Debug\Plugins\SamplePlugin.dll
+C:\Users\evasi\Documents\flashdevelop\FlashDevelop\Bin\Debug\Plugins\SamplePlugin.pdb
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.csprojResolveAssemblyReference.cache
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.PluginUI.resources
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.Resources.en_US.resources
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.csproj.GenerateResource.Cache
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.dll
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\SamplePlugin.pdb

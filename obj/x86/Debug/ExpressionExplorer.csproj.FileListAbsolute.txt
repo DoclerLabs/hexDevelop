@@ -1,0 +1,8 @@
+C:\Users\evasi\Documents\flashdevelop\FlashDevelop\Bin\Debug\Plugins\ExpressionExplorer.dll
+C:\Users\evasi\Documents\flashdevelop\FlashDevelop\Bin\Debug\Plugins\ExpressionExplorer.pdb
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.csprojResolveAssemblyReference.cache
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.PluginUI.resources
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.Resources.en_US.resources
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.csproj.GenerateResource.Cache
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.dll
+C:\Users\evasi\Documents\flashdevelop\External\Plugins\SamplePlugin\obj\x86\Debug\ExpressionExplorer.pdb
