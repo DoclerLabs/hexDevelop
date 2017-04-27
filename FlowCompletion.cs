@@ -133,72 +133,149 @@ namespace FlowCompletion
         }
 
         public bool getCompletion(bool checkNew)
-        { 
+        {
             if (!isFileValid()) return false;
+
 
             string word = null;
             var selection = findSelection(IsAllowedChar, false);
 
             AddNewDeclaration();
 
-            if (selection != null && savedDeclaration.ContainsKey(selection.Substring(0, selection.IndexOf("."))))
-                selection = selection.Replace(selection.Substring(0, selection.IndexOf(".")), savedDeclaration[selection.Substring(0, selection.IndexOf("."))]);
-            if (selection == null && !checkNew) return false;
-            else if (selection != null && !selection.EndsWith('.'))
+            try
             {
-                var dot = selection.LastIndexOf('.');
-                if (dot == -1)
+                if (selection != null && savedDeclaration.ContainsKey(selection.Substring(0, selection.IndexOf("."))))
+                    selection = selection.Replace(selection.Substring(0, selection.IndexOf(".")), savedDeclaration[selection.Substring(0, selection.IndexOf("."))]);
+                if (selection == null && !checkNew) return false;
+                else if (selection != null && !selection.EndsWith('.'))
                 {
-                    word = selection;
-                    selection = "";
+                    var dot = selection.LastIndexOf('.');
+                    if (dot == -1)
+                    {
+                        word = selection;
+                        selection = "";
+                    }
+                    else
+                    {
+                        word = selection.Substring(dot + 1);
+                        selection = selection.Substring(0, dot + 1);
+                    }
+                    if (word == "") word = null;
+                }
+                else if (selection == null && checkNew)
+                {
+                    ThreadPool.QueueUserWorkItem(delegate
+                    {
+                        completionHandler.GetCompletion(".", delegate (List<string> list)
+                        {
+                            if (list == null || list.Count == 0) return;
+
+                            InvokeSci(delegate
+                            {
+                                ShowCompletionList(list, "");
+                            });
+                        });
+                    });
+                    return true;
                 }
                 else
                 {
-                    word = selection.Substring(dot + 1);
-                    selection = selection.Substring(0, dot + 1);
+                    ThreadPool.QueueUserWorkItem(delegate
+                    {
+                        completionHandler.GetCompletion(selection, delegate (List<string> list)
+                        {
+                            if (list == null || list.Count == 0) return;
+
+                            InvokeSci(delegate
+                            {
+                                ShowCompletionList(list, word);
+                            });
+                        });
+                    });
+                    return true;
                 }
-                if (word == "") word = null;
-            }
-            else if (selection == null && checkNew)
-            {
-                ThreadPool.QueueUserWorkItem(delegate
-                {
-                    completionHandler.GetCompletion(".", delegate (List<string> list)
-                    {
-                        if (list == null || list.Count == 0) return;
 
-                        InvokeSci(delegate
-                        {
-                            ShowCompletionList(list, "");
-                        });
-                    });
-                });
                 return true;
             }
-            else
+            catch (Exception e)
             {
-                ThreadPool.QueueUserWorkItem(delegate
-                {
-                    completionHandler.GetCompletion(selection, delegate (List<string> list)
-                    {
-                        if (list == null || list.Count == 0) return;
-
-                        InvokeSci(delegate
-                        {
-                            ShowCompletionList(list, word);
-                        });
-                    });
-                });
-                return true;
+                return false;
             }
-            return true;
+        }
+
+        private string FindIncludedPath(ScintillaNet.ScintillaControl sci, string text)
+        {
+            var lineStart = sci.PositionFromLine(sci.CurrentLine);
+            var lineEnd = lineStart + sci.LineLength(sci.CurrentLine);
+            int left = sci.CurrentPos - 1;
+            int right = sci.CurrentPos - 1;
+
+            if (right < 0)
+                right = 0;
+            if (left < 0)
+                left = 0;
+
+            int index;
+            if ((index = text.IndexOf("'")) > -1)
+            {
+                for (int i = left; i >= lineStart; i--)
+                {
+                    char c = (char)sci.CharAt(i);
+                    if (IsAllowedChar(c) || c == '/' || c == ':') left = i;
+                    else break;
+                }
+
+                for (int i = right; i <= lineEnd; i++ )
+                {
+                    char c = (char)sci.CharAt(i);
+                    if (IsAllowedChar(c) || c == '/' || c == ':') right = i;
+                    else break;
+                }
+                try
+                {
+                    return text.Substring(left - lineStart, (right - lineStart) - (left - lineStart) + 1);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        private bool FindPath(ScintillaNet.ScintillaControl sci, string text)
+        {
+            int currPos = sci.CurrentPos;
+            int lineStart = sci.PositionFromLine(sci.CurrentLine);
+            int index;
+
+            if ((index = text.IndexOf("'")) > -1)
+            {
+                text = text.Substring(index + 1);
+                int secondIndex;
+                if ((secondIndex = text.IndexOf("'")) > -1)
+                {
+                    if (currPos >= (index + lineStart) && currPos <= (secondIndex + lineStart))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public bool GoToDeclaration()
         {
-            if (isFileValid("text"))
+            ScintillaNet.ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
+            var text = sci.GetLine(sci.CurrentLine);
+
+            if (isFileValid("text") || isFileValid("haxe"))
             {
-                string fileSelection = findSelection(delegate (char c)
+                string fileSelection = null;
+
+                if (text.StartsWith("@include(")) fileSelection = FindIncludedPath(sci, text);
+                else if (FindPath(sci, text)) fileSelection = FindIncludedPath(sci, text);
+                else fileSelection = findSelection(delegate (char c)
                 {
                     foreach (char inv in Path.GetInvalidPathChars())
                     {
@@ -206,12 +283,11 @@ namespace FlowCompletion
                     }
                     return true;
                 });
-                if (fileSelection != null && fileSelection.EndsWith(".flow") && OpenFile(fileSelection))
-                    return false;
+                if (fileSelection != null && (fileSelection.EndsWith(".flow") || fileSelection.EndsWith(".hx")) && OpenFile(fileSelection))
+                    return true;
+            }
+                if (!isFileValid("text")) return false;
                 var selection = findSelection(IsAllowedChar, true, false);
-                MessageBox.Show(selection);
-                var sci = PluginBase.MainForm.CurrentDocument.SciControl;
-
                 if (selection == null || selection == "") return false;
 
                 if (savedDeclaration.Count == 0) AddNewDeclaration();
@@ -224,7 +300,6 @@ namespace FlowCompletion
                     }
                 }
                 Goto(selection, null);
-            }
             return true;
         }
 
