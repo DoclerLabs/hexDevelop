@@ -22,6 +22,7 @@ namespace EditorConfig
         int originalTabWidth;
         int originalIndentSize;
         ScintillaNet.Enums.EndOfLine originalEOLMode;
+        int originalPrintMargin;
         
 
         #region Required Properties
@@ -114,7 +115,7 @@ namespace EditorConfig
                     else
                     {
                         var document = DocumentManager.FindDocument(fileOpen.Value);
-                        OnOpenFile(document);
+                        ApplyConfig(document);
                     }
 
                     break;
@@ -123,13 +124,13 @@ namespace EditorConfig
                     {
                         //reset settings to editorconfig if the user changed them
                         foreach (var doc in PluginBase.MainForm.Documents)
-                            OnOpenFile(doc);
+                            ApplyConfig(doc);
                     }
 
                     break;
                 case EventType.FileSwitch:
                     if (PluginBase.CurrentProject != null && !PluginBase.MainForm.ClosingEntirely) //not loaded yet / unloading again
-                        OnOpenFile(PluginBase.MainForm.CurrentDocument);
+                        ApplyConfig(PluginBase.MainForm.CurrentDocument);
 
                     break;
                 case EventType.UIClosing:
@@ -154,6 +155,7 @@ namespace EditorConfig
             originalEOLMode = PluginBase.Settings.EOLMode;
             originalTabWidth = PluginBase.Settings.TabWidth;
             originalIndentSize = PluginBase.Settings.IndentSize;
+            originalPrintMargin = PluginBase.Settings.PrintMarginColumn;
         }
 
         /// <summary>
@@ -167,6 +169,7 @@ namespace EditorConfig
             PluginBase.Settings.EOLMode = originalEOLMode;
             PluginBase.Settings.TabWidth = originalTabWidth;
             PluginBase.Settings.IndentSize = originalIndentSize;
+            PluginBase.Settings.PrintMarginColumn = originalPrintMargin;
         }
 
         /// <summary>
@@ -183,7 +186,7 @@ namespace EditorConfig
             {
                 var doc = DocumentManager.FindDocument(cachedFile);
                 if (doc != null)
-                    OnOpenFile(doc);
+                    ApplyConfig(doc);
             }
             openingCache.Clear();
         }
@@ -193,7 +196,7 @@ namespace EditorConfig
         /// </summary> 
         public void AddEventHandlers()
         {
-            EventManager.AddEventHandler(this, EventType.FileOpen | EventType.FileEncode | EventType.Command | EventType.ApplySettings | EventType.FileSwitch | EventType.UIClosing);
+            EventManager.AddEventHandler(this, EventType.FileOpen | EventType.Command | EventType.ApplySettings | EventType.FileSwitch | EventType.UIClosing);
         }
 
         /// <summary>
@@ -204,7 +207,7 @@ namespace EditorConfig
             return parser.Parse(filename).First();
         }
 
-        void OnOpenFile(ITabbedDocument document)
+        void ApplyConfig(ITabbedDocument document)
         {
             RestoreSettings();
 
@@ -274,16 +277,12 @@ namespace EditorConfig
             PluginBase.Settings.TabWidth = config.TabWidth ?? PluginBase.Settings.TabWidth;
 
             //indent size
-            if (config.IndentSize?.NumberOfColumns != null) PluginBase.Settings.IndentSize = (int)config.IndentSize.NumberOfColumns;
+            PluginBase.Settings.IndentSize = config.IndentSize?.NumberOfColumns ?? PluginBase.Settings.IndentSize;
         }
 
         void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
         {
-            if (sci == null || sci.IsReadOnly || config.MaxLineLength == null) return;
-
-            //This might be problematic if there already is an edge defined. In that case, it is overridden
-            sci.EdgeMode = (int)ScintillaNet.Enums.EdgeVisualStyle.Line;
-            sci.EdgeColumn = (int)config.MaxLineLength;
+            PluginBase.Settings.PrintMarginColumn = config.MaxLineLength ?? PluginBase.Settings.PrintMarginColumn;
         }
 
         void ApplyFinalNewLine(FileConfiguration config)
