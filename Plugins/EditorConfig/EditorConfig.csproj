@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EditorConfig</RootNamespace>
     <AssemblyName>EditorConfig</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -37,6 +37,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EditorConfig.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=fe6ce3ea283749f2, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\editorconfig.0.12.1\lib\EditorConfig.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -45,20 +49,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Charset.cs" />
-    <Compile Include="Core\EditorConfigFile.cs" />
-    <Compile Include="Core\EditorConfigParser.cs" />
-    <Compile Include="Core\EndOfLine.cs" />
-    <Compile Include="Core\FileConfiguration.cs" />
-    <Compile Include="Core\IndentSize.cs" />
-    <Compile Include="Core\IndentStyle.cs" />
-    <Compile Include="Core\Minimatcher.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Core\LICENSE" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
