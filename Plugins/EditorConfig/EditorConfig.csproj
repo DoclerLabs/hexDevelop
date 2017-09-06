@@ -44,9 +44,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="Theraot.Core">
-      <HintPath>..\..\editorconfig-core-net\src\EditorConfig.Core\bin\Debug\Theraot.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PluginMain.cs" />
