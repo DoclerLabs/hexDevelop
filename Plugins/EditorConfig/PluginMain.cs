@@ -326,23 +326,23 @@ namespace EditorConfig
         /// <summary>
         /// Helper method to make sure original settings are handled correctly
         /// </summary>
-        /// <param name="getConfigOption">Getter function for the config option that should be processed</param>
+        /// <param name="GetConfigOption">Getter function for the config option that should be processed</param>
         /// <param name="original">The original value of the setting, should be null if no setting was backuped yet</param>
-        /// <param name="getSetting">Getter function for PluginCore.Setting.YourSetting</param>
-        /// <param name="applyOriginal">Applies the original settings if the document is not affected by .editorconfig</param>
-        /// <param name="applierFunc">Applies the config option. Is only called if <code>getConfigOption() != null</code></param>
-        void Apply<S, T>(Func<S> getConfigOption, ref T? original, Func<T> getSetting, Action<T> applyOriginal, Action applierFunc) where T : struct
+        /// <param name="GetSetting">Getter function for PluginCore.Setting.YourSetting</param>
+        /// <param name="ApplyOriginal">Applies the original settings if the document is not affected by .editorconfig</param>
+        /// <param name="ApplierFunc">Applies the config option. Is only called if <code>getConfigOption() != null</code></param>
+        static void Apply<S, T>(Func<S> GetConfigOption, ref T? original, Func<T> GetSetting, Action<T> ApplyOriginal, Action ApplierFunc) where T : struct
         {
-            if (getConfigOption() != null) //document affected by .editorconfig
+            if (GetConfigOption() != null) //document affected by .editorconfig
             {
                 if (original == null) //we have no backup yet
-                    original = getSetting(); //backup
+                    original = GetSetting(); //backup
 
-                applierFunc();
+                ApplierFunc();
             }
             else if (original != null) //document not affected and we have saved settings from before
             {
-                applyOriginal((T) original); //restore
+                ApplyOriginal((T) original); //restore
             }
         }
 
