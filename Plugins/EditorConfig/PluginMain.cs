@@ -15,14 +15,14 @@ namespace EditorConfig
         EditorConfigParser parser;
         Project lastProject;
         readonly List<string> openingCache = new List<string>();
-
-        bool originalTrimWhitespace;
-        bool originalEnsureLastLine;
-        bool originalUseTabs;
-        int originalTabWidth;
-        int originalIndentSize;
-        ScintillaNet.Enums.EndOfLine originalEOLMode;
-        int originalPrintMargin;
+        
+        bool? originalTrimWhitespace;
+        bool? originalEnsureLastLine;
+        bool? originalUseTabs;
+        int? originalTabWidth;
+        int? originalIndentSize;
+        ScintillaNet.Enums.EndOfLine? originalEOLMode;
+        int? originalPrintMargin;
         
 
         #region Required Properties
@@ -72,8 +72,6 @@ namespace EditorConfig
         public void Initialize()
         {
             this.AddEventHandlers();
-
-            BackupSettings();
         }
 
         /// <summary>
@@ -123,8 +121,7 @@ namespace EditorConfig
                     if (PluginBase.CurrentProject != null && !PluginBase.MainForm.ClosingEntirely)
                     {
                         //reset settings to editorconfig if the user changed them
-                        foreach (var doc in PluginBase.MainForm.Documents)
-                            ApplyConfig(doc);
+                        ApplyConfig(PluginBase.MainForm.CurrentDocument);
                     }
 
                     break;
@@ -145,31 +142,17 @@ namespace EditorConfig
         #region Custom Methods
 
         /// <summary>
-        /// Backups the current user settings, so they can be restored later.
-        /// </summary>
-        void BackupSettings()
-        {
-            originalUseTabs = PluginBase.Settings.UseTabs;
-            originalEnsureLastLine = PluginBase.Settings.EnsureLastLineEnd;
-            originalTrimWhitespace = PluginBase.Settings.StripTrailingSpaces;
-            originalEOLMode = PluginBase.Settings.EOLMode;
-            originalTabWidth = PluginBase.Settings.TabWidth;
-            originalIndentSize = PluginBase.Settings.IndentSize;
-            originalPrintMargin = PluginBase.Settings.PrintMarginColumn;
-        }
-
-        /// <summary>
-        /// Restores the settings previously backuped by <see cref="BackupSettings"/>
+        /// Restores the settings previously backuped.
         /// </summary>
         void RestoreSettings()
         {
-            PluginBase.Settings.UseTabs = originalUseTabs;
-            PluginBase.Settings.EnsureLastLineEnd = originalEnsureLastLine;
-            PluginBase.Settings.StripTrailingSpaces = originalTrimWhitespace;
-            PluginBase.Settings.EOLMode = originalEOLMode;
-            PluginBase.Settings.TabWidth = originalTabWidth;
-            PluginBase.Settings.IndentSize = originalIndentSize;
-            PluginBase.Settings.PrintMarginColumn = originalPrintMargin;
+            if (originalUseTabs != null) PluginBase.Settings.UseTabs = (bool) originalUseTabs;
+            if (originalEnsureLastLine != null) PluginBase.Settings.EnsureLastLineEnd = (bool) originalEnsureLastLine;
+            if (originalTrimWhitespace != null) PluginBase.Settings.StripTrailingSpaces = (bool) originalTrimWhitespace;
+            if (originalEOLMode != null) PluginBase.Settings.EOLMode = (ScintillaNet.Enums.EndOfLine) originalEOLMode;
+            if (originalTabWidth != null) PluginBase.Settings.TabWidth = (int) originalTabWidth;
+            if (originalIndentSize != null) PluginBase.Settings.IndentSize = (int) originalIndentSize;
+            if (originalPrintMargin != null) PluginBase.Settings.PrintMarginColumn = (int) originalPrintMargin;
         }
 
         /// <summary>
@@ -209,27 +192,24 @@ namespace EditorConfig
 
         void ApplyConfig(ITabbedDocument document)
         {
-            RestoreSettings();
-
             var sci1 = document.SplitSci1;
             var sci2 = document.SplitSci2;
             var config = GetConfig(document.FileName);
-
+            
             ApplyEOL(sci1, config);
             ApplyEOL(sci2, config);
-
-            ApplyMaxLineLength(sci1, config);
-            ApplyMaxLineLength(sci2, config);
 
             ApplyCharset(sci1, config);
             ApplyCharset(sci2, config);
 
-            ApplyIndentation(config);
+            ApplyIndentation(sci1, config);
+            ApplyIndentation(sci2, config);
+
+            ApplyMaxLineLength(config);
             ApplyTrimWhitespace(config);
             ApplyFinalNewLine(config);
 
             document.RefreshTexts();
-
         }
 
         void ApplyCharset(ScintillaControl sci, FileConfiguration config)
@@ -258,64 +238,112 @@ namespace EditorConfig
             sci.Encoding = e;
         }
 
-        void ApplyIndentation(FileConfiguration config)
+        void ApplyIndentation(ScintillaControl sci, FileConfiguration config)
         {
-            //indent style
-            switch (config.IndentStyle)
-            {
-                case IndentStyle.Space:
-                    PluginBase.Settings.UseTabs = false;
-                    break;
-                case IndentStyle.Tab:
-                    PluginBase.Settings.UseTabs = true;
-                    break;
-                case null:
-                    return;
-            }
+            Apply(() => config.IndentStyle, ref originalUseTabs, () => PluginBase.Settings.UseTabs, s => PluginBase.Settings.UseTabs = s,
+                () =>
+                {
+                    //indent style
+                    switch (config.IndentStyle)
+                    {
+                        case IndentStyle.Space:
+                            PluginBase.Settings.UseTabs = false;
+                            sci.IsUseTabs = false;
+                            break;
+                        case IndentStyle.Tab:
+                            PluginBase.Settings.UseTabs = true;
+                            sci.IsUseTabs = true;
+                            break;
+                    }
+                });
 
-            //tab width
-            PluginBase.Settings.TabWidth = config.TabWidth ?? PluginBase.Settings.TabWidth;
+            Apply(() => config.TabWidth, ref originalTabWidth, () => PluginBase.Settings.TabWidth, s => PluginBase.Settings.TabWidth = s,
+                () =>
+                {
+                    //tab width
+                    PluginBase.Settings.TabWidth = (int) config.TabWidth;
+                    sci.TabWidth = (int) config.TabWidth;
+                });
 
-            //indent size
-            PluginBase.Settings.IndentSize = config.IndentSize?.NumberOfColumns ?? PluginBase.Settings.IndentSize;
+            Apply(() => config.IndentSize?.NumberOfColumns, ref originalIndentSize, () => PluginBase.Settings.IndentSize, s => PluginBase.Settings.IndentSize = s,
+                () =>
+                {
+                    //indent size
+                    PluginBase.Settings.IndentSize = (int) config.IndentSize?.NumberOfColumns;
+                    sci.Indent = (int) config.IndentSize?.NumberOfColumns;
+                });
         }
 
-        void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
+        void ApplyMaxLineLength(FileConfiguration config)
         {
-            PluginBase.Settings.PrintMarginColumn = config.MaxLineLength ?? PluginBase.Settings.PrintMarginColumn;
+            Apply(() => config.MaxLineLength, ref originalPrintMargin, () => PluginBase.Settings.PrintMarginColumn, s => PluginBase.Settings.PrintMarginColumn = s,
+                () => PluginBase.Settings.PrintMarginColumn = (int)config.MaxLineLength);
         }
 
         void ApplyFinalNewLine(FileConfiguration config)
         {
-            PluginBase.Settings.EnsureLastLineEnd = config.InsertFinalNewline ?? PluginBase.Settings.EnsureLastLineEnd;
+            Apply(() => config.InsertFinalNewline, ref originalEnsureLastLine, () => PluginBase.Settings.EnsureLastLineEnd, s => PluginBase.Settings.EnsureLastLineEnd = s,
+                () => PluginBase.Settings.EnsureLastLineEnd = (bool)config.InsertFinalNewline);
         }
 
         void ApplyEOL(ScintillaControl sci, FileConfiguration config)
         {
             if (sci == null || sci.IsReadOnly) return;
 
-            ScintillaNet.Enums.EndOfLine mode = sci.EndOfLineMode;
-            switch (config.EndOfLine)
-            {
-                case EndOfLine.CR:
-                    mode = ScintillaNet.Enums.EndOfLine.CR;
-                    break;
-                case EndOfLine.CRLF:
-                    mode = ScintillaNet.Enums.EndOfLine.CRLF;
-                    break;
-                case EndOfLine.LF:
-                    mode = ScintillaNet.Enums.EndOfLine.LF;
-                    break;
-                case null:
-                    return;
-            }
-            PluginBase.Settings.EOLMode = sci.EndOfLineMode = mode;
-            sci.ConvertEOLs(mode);
+            Apply(() => config.EndOfLine, ref originalEOLMode, () => PluginBase.Settings.EOLMode, s => PluginBase.Settings.EOLMode = s,
+                () =>
+                {
+                    ScintillaNet.Enums.EndOfLine mode = sci.EndOfLineMode;
+                    switch (config.EndOfLine)
+                    {
+                        case EndOfLine.CR:
+                            mode = ScintillaNet.Enums.EndOfLine.CR;
+                            break;
+                        case EndOfLine.CRLF:
+                            mode = ScintillaNet.Enums.EndOfLine.CRLF;
+                            break;
+                        case EndOfLine.LF:
+                            mode = ScintillaNet.Enums.EndOfLine.LF;
+                            break;
+                        case null:
+                            return;
+                    }
+
+                    PluginBase.Settings.EOLMode = sci.EndOfLineMode = mode;
+                    sci.ConvertEOLs(mode);
+                });
         }
 
         void ApplyTrimWhitespace(FileConfiguration config)
         {
+            Apply(() => config.TrimTrailingWhitespace, ref originalTrimWhitespace, () => PluginBase.Settings.StripTrailingSpaces,
+                s => PluginBase.Settings.StripTrailingSpaces = s,
+                () => PluginBase.Settings.StripTrailingSpaces = (bool) config.TrimTrailingWhitespace);
+
             PluginBase.Settings.StripTrailingSpaces = config.TrimTrailingWhitespace ?? PluginBase.Settings.StripTrailingSpaces;
+        }
+
+        /// <summary>
+        /// Helper method to make sure original settings are handled correctly
+        /// </summary>
+        /// <param name="getConfigOption">Getter function for the config option that should be processed</param>
+        /// <param name="original">The original value of the setting, should be null if no setting was backuped yet</param>
+        /// <param name="getSetting">Getter function for PluginCore.Setting.YourSetting</param>
+        /// <param name="applyOriginal">Applies the original settings if the document is not affected by .editorconfig</param>
+        /// <param name="applierFunc">Applies the config option. Is only called if <code>getConfigOption() != null</code></param>
+        void Apply<S, T>(Func<S> getConfigOption, ref T? original, Func<T> getSetting, Action<T> applyOriginal, Action applierFunc) where T : struct
+        {
+            if (getConfigOption() != null) //document affected by .editorconfig
+            {
+                if (original == null) //we have no backup yet
+                    original = getSetting(); //backup
+
+                applierFunc();
+            }
+            else if (original != null) //document not affected and we have saved settings from before
+            {
+                applyOriginal((T) original); //restore
+            }
         }
 
         #endregion
