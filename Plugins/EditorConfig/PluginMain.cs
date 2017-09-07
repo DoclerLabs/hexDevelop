@@ -1,95 +1,67 @@
 using System;
-using System.IO;
 using PluginCore;
-using PluginCore.Helpers;
-using PluginCore.Localization;
 using PluginCore.Managers;
-using PluginCore.Utilities;
-using WeifenLuo.WinFormsUI.Docking;
 using ProjectManager.Projects;
-using System.Windows.Forms;
 using EditorConfig.Core;
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using ScintillaNet;
-using PluginCore.Controls;
 
 namespace EditorConfig
 {
     public class PluginMain : IPlugin
     {
-        private String pluginName = "EditorConfig";
-        private String pluginGuid = "0158C50F-6FC7-45F3-BACA-F3C0F1242CEF";
-        private String pluginHelp = "http://hexmachina.org/";
-        private String pluginDesc = "Reads and applies .editorconfig files";
-        private String pluginAuth = "Christoph Otter";
+        EditorConfigParser parser;
+        Project lastProject;
+        readonly List<string> openingCache = new List<string>();
 
-        private EditorConfigParser parser;
-        private Project lastProject;
-        private List<string> openingCache = new List<string>();
-
-        private bool originalTrimWhitespace;
-        private bool originalEnsureLastLine;
+        bool originalTrimWhitespace;
+        bool originalEnsureLastLine;
+        bool originalUseTabs;
+        int originalTabWidth;
+        int originalIndentSize;
+        ScintillaNet.Enums.EndOfLine originalEOLMode;
+        int originalPrintMargin;
+        
 
         #region Required Properties
 
         /// <summary>
         /// Api level of the plugin
         /// </summary>
-        public Int32 Api
-        {
-            get { return 1; }
-        }
+        public int Api => 1;
 
         /// <summary>
         /// Name of the plugin
         /// </summary> 
-        public String Name
-        {
-            get { return this.pluginName; }
-        }
+        public string Name { get; } = "EditorConfig";
 
         /// <summary>
         /// GUID of the plugin
         /// </summary>
-        public String Guid
-        {
-            get { return this.pluginGuid; }
-        }
+        public string Guid { get; } = "0158C50F-6FC7-45F3-BACA-F3C0F1242CEF";
 
         /// <summary>
         /// Author of the plugin
         /// </summary> 
-        public String Author
-        {
-            get { return this.pluginAuth; }
-        }
+        public string Author { get; } = "Christoph Otter";
 
         /// <summary>
         /// Description of the plugin
         /// </summary> 
-        public String Description
-        {
-            get { return this.pluginDesc; }
-        }
+        public string Description { get; } = "Reads and applies .editorconfig files";
 
         /// <summary>
         /// Web address for help
         /// </summary> 
-        public String Help
-        {
-            get { return this.pluginHelp; }
-        }
+        public string Help { get; } = "http://hexmachina.org/";
 
         /// <summary>
         /// Object that contains the settings
         /// </summary>
-        public Object Settings
-        {
-            get { return null; }
-        }
-        
+        public object Settings => null;
+
         #endregion
         
         #region Required Methods
@@ -100,6 +72,8 @@ namespace EditorConfig
         public void Initialize()
         {
             this.AddEventHandlers();
+
+            BackupSettings();
         }
 
         /// <summary>
@@ -112,7 +86,7 @@ namespace EditorConfig
         /// <summary>
         /// Handles the incoming events
         /// </summary>
-        public void HandleEvent(Object sender, NotifyEvent e, HandlingPriority priority)
+        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
         {
             switch (e.Type)
             {
@@ -131,21 +105,6 @@ namespace EditorConfig
                         }
                     }
                     break;
-                case EventType.FileEncode: //have to use FileEncode, because otherwise some settings of SciControl are overwritten after FileSaving
-                    DataEvent d = (DataEvent)e;
-                    string file = d.Action;
-                    var document = DocumentManager.FindDocument(file);
-
-                    //Make sure indentation is not overwritten
-                    ApplyIndentation(document.SciControl, GetConfig(document.FileName));
-
-                    OnSaveFile(document);
-
-                    //reset to old values
-                    PluginBase.Settings.StripTrailingSpaces = originalTrimWhitespace;
-                    PluginBase.Settings.EnsureLastLineEnd = originalEnsureLastLine;
-
-                    break;
                 case EventType.FileOpen:
                     TextEvent fileOpen = (TextEvent)e;
                     
@@ -155,9 +114,27 @@ namespace EditorConfig
                     }
                     else
                     {
-                        document = DocumentManager.FindDocument(fileOpen.Value);
-                        OnOpenFile(document);
+                        var document = DocumentManager.FindDocument(fileOpen.Value);
+                        ApplyConfig(document);
                     }
+
+                    break;
+                case EventType.ApplySettings:
+                    if (PluginBase.CurrentProject != null && !PluginBase.MainForm.ClosingEntirely)
+                    {
+                        //reset settings to editorconfig if the user changed them
+                        foreach (var doc in PluginBase.MainForm.Documents)
+                            ApplyConfig(doc);
+                    }
+
+                    break;
+                case EventType.FileSwitch:
+                    if (PluginBase.CurrentProject != null && !PluginBase.MainForm.ClosingEntirely) //not loaded yet / unloading again
+                        ApplyConfig(PluginBase.MainForm.CurrentDocument);
+
+                    break;
+                case EventType.UIClosing:
+                    RestoreSettings();
 
                     break;
             }
@@ -166,26 +143,50 @@ namespace EditorConfig
         #endregion
 
         #region Custom Methods
+
+        /// <summary>
+        /// Backups the current user settings, so they can be restored later.
+        /// </summary>
+        void BackupSettings()
+        {
+            originalUseTabs = PluginBase.Settings.UseTabs;
+            originalEnsureLastLine = PluginBase.Settings.EnsureLastLineEnd;
+            originalTrimWhitespace = PluginBase.Settings.StripTrailingSpaces;
+            originalEOLMode = PluginBase.Settings.EOLMode;
+            originalTabWidth = PluginBase.Settings.TabWidth;
+            originalIndentSize = PluginBase.Settings.IndentSize;
+            originalPrintMargin = PluginBase.Settings.PrintMarginColumn;
+        }
+
+        /// <summary>
+        /// Restores the settings previously backuped by <see cref="BackupSettings"/>
+        /// </summary>
+        void RestoreSettings()
+        {
+            PluginBase.Settings.UseTabs = originalUseTabs;
+            PluginBase.Settings.EnsureLastLineEnd = originalEnsureLastLine;
+            PluginBase.Settings.StripTrailingSpaces = originalTrimWhitespace;
+            PluginBase.Settings.EOLMode = originalEOLMode;
+            PluginBase.Settings.TabWidth = originalTabWidth;
+            PluginBase.Settings.IndentSize = originalIndentSize;
+            PluginBase.Settings.PrintMarginColumn = originalPrintMargin;
+        }
+
         /// <summary>
         /// Processes the cached open files.
         /// In this case, cached means that these files were just opened, but OnOpenFile was not called yet.
         /// This is needed, because FileOpen event is fired before ProjectManager.Project event
         /// </summary>
-        private void ProcessCache()
+        void ProcessCache()
         {
-            if (parser == null)
-            {
-                return;
-            }
+            if (parser == null) return;
 
             //process cache first
-            foreach (string cachedFile in openingCache)
+            foreach (var cachedFile in openingCache)
             {
                 var doc = DocumentManager.FindDocument(cachedFile);
                 if (doc != null)
-                {
-                    OnOpenFile(doc);
-                }
+                    ApplyConfig(doc);
             }
             openingCache.Clear();
         }
@@ -195,46 +196,47 @@ namespace EditorConfig
         /// </summary> 
         public void AddEventHandlers()
         {
-            EventType eventMask = EventType.FileOpen | EventType.FileEncode | EventType.Command;
-            EventManager.AddEventHandler(this, eventMask);
+            EventManager.AddEventHandler(this, EventType.FileOpen | EventType.Command | EventType.ApplySettings | EventType.FileSwitch | EventType.UIClosing);
         }
 
         /// <summary>
         /// Gets the .editorconfig properties that apply to the given file
         /// </summary>
-        private FileConfiguration GetConfig(string filename)
+        FileConfiguration GetConfig(string filename)
         {
             return parser.Parse(filename).First();
         }
 
-        private void OnOpenFile(ITabbedDocument document)
+        void ApplyConfig(ITabbedDocument document)
         {
-            var sci = document.SciControl;
+            RestoreSettings();
+
+            var sci1 = document.SplitSci1;
+            var sci2 = document.SplitSci2;
             var config = GetConfig(document.FileName);
 
-            ApplyMaxLineLength(sci, config);
+            ApplyEOL(sci1, config);
+            ApplyEOL(sci2, config);
 
-            ApplyCharset(sci, config);
+            ApplyMaxLineLength(sci1, config);
+            ApplyMaxLineLength(sci2, config);
 
-            ApplyIndentation(sci, config);
+            ApplyCharset(sci1, config);
+            ApplyCharset(sci2, config);
+
+            ApplyIndentation(config);
+            ApplyTrimWhitespace(config);
+            ApplyFinalNewLine(config);
 
             document.RefreshTexts();
 
         }
 
-        private void OnSaveFile(ITabbedDocument document)
+        void ApplyCharset(ScintillaControl sci, FileConfiguration config)
         {
-            var sci = document.SciControl;
-            var config = GetConfig(document.FileName);
+            if (sci == null || sci.IsReadOnly) return;
 
-            ApplyEOL(sci, config);
-
-            ApplyTrimWhitespace(sci, config);
-        }
-
-        private void ApplyCharset(ScintillaControl sci, FileConfiguration config)
-        {
-            Encoding e = sci.Encoding;
+            var e = sci.Encoding;
             switch (config.Charset)
             {
                 case Charset.Latin1:
@@ -256,51 +258,42 @@ namespace EditorConfig
             sci.Encoding = e;
         }
 
-        private void ApplyIndentation(ScintillaControl sci, FileConfiguration config)
+        void ApplyIndentation(FileConfiguration config)
         {
             //indent style
             switch (config.IndentStyle)
             {
                 case IndentStyle.Space:
-                    sci.IsUseTabs = false;
+                    PluginBase.Settings.UseTabs = false;
                     break;
                 case IndentStyle.Tab:
-                    sci.IsUseTabs = true;
+                    PluginBase.Settings.UseTabs = true;
                     break;
+                case null:
+                    return;
             }
 
             //tab width
-            sci.TabWidth = config.TabWidth ?? sci.TabWidth;
+            PluginBase.Settings.TabWidth = config.TabWidth ?? PluginBase.Settings.TabWidth;
 
             //indent size
-            if (config.IndentSize?.NumberOfColumns != null) sci.Indent = (int)config.IndentSize.NumberOfColumns;
+            PluginBase.Settings.IndentSize = config.IndentSize?.NumberOfColumns ?? PluginBase.Settings.IndentSize;
         }
 
-        private void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
+        void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
         {
-            if (config.MaxLineLength != null)
-            {
-                //This might be problematic if there already is an edge defined. In that case, it is overridden
-                sci.EdgeMode = (int)ScintillaNet.Enums.EdgeVisualStyle.Line;
-                sci.EdgeColumn = (int)config.MaxLineLength;
-            }
+            PluginBase.Settings.PrintMarginColumn = config.MaxLineLength ?? PluginBase.Settings.PrintMarginColumn;
         }
 
-        private void ApplyFinalNewLine(ScintillaControl sci, FileConfiguration config)
+        void ApplyFinalNewLine(FileConfiguration config)
         {
-            if (config.InsertFinalNewline == true)
-            {
-                sci.AddLastLineEnd();
-            }
-
-            //we handle this ourself, however this is reset to the previous value later,
-            //to not mess with the user's settings
-            originalEnsureLastLine = PluginBase.Settings.EnsureLastLineEnd;
-            PluginBase.Settings.EnsureLastLineEnd = false;
+            PluginBase.Settings.EnsureLastLineEnd = config.InsertFinalNewline ?? PluginBase.Settings.EnsureLastLineEnd;
         }
 
-        private void ApplyEOL(ScintillaControl sci, FileConfiguration config)
+        void ApplyEOL(ScintillaControl sci, FileConfiguration config)
         {
+            if (sci == null || sci.IsReadOnly) return;
+
             ScintillaNet.Enums.EndOfLine mode = sci.EndOfLineMode;
             switch (config.EndOfLine)
             {
@@ -313,23 +306,16 @@ namespace EditorConfig
                 case EndOfLine.LF:
                     mode = ScintillaNet.Enums.EndOfLine.LF;
                     break;
+                case null:
+                    return;
             }
+            PluginBase.Settings.EOLMode = sci.EndOfLineMode = mode;
             sci.ConvertEOLs(mode);
         }
 
-        private void ApplyTrimWhitespace(ScintillaControl sci, FileConfiguration config)
+        void ApplyTrimWhitespace(FileConfiguration config)
         {
-            if (config.TrimTrailingWhitespace != null)
-            {
-                if ((bool)config.TrimTrailingWhitespace)
-                {
-                    sci.StripTrailingSpaces(false);
-                }
-            }
-
-            //same as ApplyFinalNewLine
-            originalTrimWhitespace = PluginBase.Settings.StripTrailingSpaces;
-            PluginBase.Settings.StripTrailingSpaces = false;
+            PluginBase.Settings.StripTrailingSpaces = config.TrimTrailingWhitespace ?? PluginBase.Settings.StripTrailingSpaces;
         }
 
         #endregion

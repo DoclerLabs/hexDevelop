@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DSLCompletion</RootNamespace>
     <AssemblyName>DSLCompletion</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\External\Plugins\AS2Context\AS2Context.csproj">
-      <Project>{74AD0487-CEF9-43FE-9283-BC6F79539ADE}</Project>
+      <Project>{74ad0487-cef9-43fe-9283-bc6f79539ade}</Project>
       <Name>AS2Context</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PluginCore\PluginCore.csproj">
