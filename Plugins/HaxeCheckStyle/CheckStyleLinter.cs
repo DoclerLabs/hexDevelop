@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using PluginCore.Managers;
 
 namespace HaxeCheckStyle
 {
@@ -28,11 +29,18 @@ namespace HaxeCheckStyle
 
         public void LintAsync(string[] files, LintCallback callback)
         {
+            ProcessRunner p = new ProcessRunner();
             try
             {
+                string command = FindHaxelibPath();
+                if (command == null)
+                {
+                    callback(null);
+                    return;
+                }
+
                 var list = new List<LintingResult>();
 
-                ProcessRunner p = new ProcessRunner();
                 Action<object, string> output = (sender, line) =>
                 {
                     var result = ParseLine(line);
@@ -54,8 +62,6 @@ namespace HaxeCheckStyle
                     p.WorkingDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
                 }
 
-                string command = "$(CompilerPath)\\haxelib.exe";
-                command = PluginBase.MainForm.ProcessArgString(command);
                 string args = "run checkstyle";
 
                 foreach (string file in files)
@@ -70,8 +76,10 @@ namespace HaxeCheckStyle
 
                 p.Run(command, args);
             }
-            catch {
+            catch
+            {
                 callback(null);
+                p.KillProcess();
             }
         }
 
@@ -108,6 +116,27 @@ namespace HaxeCheckStyle
                 }
 
                 return result;
+            }
+
+            TraceManager.AddAsync(line);
+            return null;
+        }
+
+        static string FindHaxelibPath()
+        {
+            string command = "$(CompilerPath)\\haxelib.exe";
+            command = PluginBase.MainForm.ProcessArgString(command);
+
+            if (File.Exists(command)) return command;
+
+            command = Path.Combine(Environment.ExpandEnvironmentVariables("%HAXEPATH%"), "haxelib.exe");
+
+            if (File.Exists(command)) return command;
+
+            foreach (var path in Environment.ExpandEnvironmentVariables("%PATH%").Split(';'))
+            {
+                command = Path.Combine(path, "haxelib.exe");
+                if (File.Exists(command)) return command;
             }
 
             return null;
