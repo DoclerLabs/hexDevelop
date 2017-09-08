@@ -10,70 +10,23 @@ namespace HaxeCheckStyle
 {
     public class PluginMain : IPlugin
     {
-        private string pluginName = "HaxeCheckStyle";
-        private string pluginGuid = "B4584C60-3D44-43DE-B1D5-6F14968ADB5A";
-        private string pluginHelp = "http://hexmachina.org/";
-        private string pluginDesc = "Adds haxe-checkstyle support to FlashDevelop.";
-        private string pluginAuth = "Christoph Otter";
         private string settingFilename;
         private Settings settingObject;
 
-        public int Api
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        public int Api => 1;
 
-        public string Author
-        {
-            get
-            {
-                return pluginAuth;
-            }
-        }
+        public string Author => "Christoph Otter";
 
-        public string Description
-        {
-            get
-            {
-                return pluginDesc;
-            }
-        }
+        public string Description => "Adds haxe-checkstyle support to FlashDevelop.";
 
-        public string Guid
-        {
-            get
-            {
-                return pluginGuid;
-            }
-        }
+        public string Guid => "B4584C60-3D44-43DE-B1D5-6F14968ADB5A";
 
-        public string Help
-        {
-            get
-            {
-                return pluginHelp;
-            }
-        }
+        public string Help => "http://hexmachina.org/";
 
-        public string Name
-        {
-            get
-            {
-                return pluginName;
-            }
-        }
+        public string Name => "HaxeCheckStyle";
 
         [Browsable(false)]
-        public object Settings
-        {
-            get
-            {
-                return settingObject;
-            }
-        }
+        public object Settings => settingObject;
 
         public void Initialize()
         {
@@ -94,7 +47,7 @@ namespace HaxeCheckStyle
 
         private void InitBasics()
         {
-            string dataPath = Path.Combine(PathHelper.DataDir, pluginName);
+            string dataPath = Path.Combine(PathHelper.DataDir, Name);
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             this.settingFilename = Path.Combine(dataPath, "Settings.fdb");
         }

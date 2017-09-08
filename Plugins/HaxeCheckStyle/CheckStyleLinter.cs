@@ -83,6 +83,11 @@ namespace HaxeCheckStyle
             }
         }
 
+        public void LintProjectAsync(IProject project, LintCallback callback)
+        {
+            LintAsync(project.SourcePaths, callback);
+        }
+
         LintingResult ParseLine(string line)
         {
             var match = fileEntry.Match(line);
