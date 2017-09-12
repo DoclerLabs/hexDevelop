@@ -123,7 +123,8 @@ namespace HaxeCheckStyle
                 return result;
             }
 
-            TraceManager.AddAsync(line);
+            if (line.StartsWithOrdinal("Error"))
+                TraceManager.Add(line);
             return null;
         }
 
