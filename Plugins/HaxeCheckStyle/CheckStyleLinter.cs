@@ -138,12 +138,8 @@ namespace HaxeCheckStyle
             command = Path.Combine(Environment.ExpandEnvironmentVariables("%HAXEPATH%"), "haxelib.exe");
 
             if (File.Exists(command)) return command;
-
-            foreach (var path in Environment.ExpandEnvironmentVariables("%PATH%").Split(';'))
-            {
-                command = Path.Combine(path, "haxelib.exe");
-                if (File.Exists(command)) return command;
-            }
+            
+            TraceManager.Add("Error: Could not find haxelib.exe");
 
             return null;
         }
