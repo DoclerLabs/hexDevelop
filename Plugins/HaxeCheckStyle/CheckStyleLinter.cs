@@ -139,7 +139,7 @@ namespace HaxeCheckStyle
 
             if (File.Exists(command)) return command;
             
-            TraceManager.Add("Error: Could not find haxelib.exe", (int)TraceType.Error);
+            TraceManager.Add("Error: haxelib.exe not found", (int)TraceType.Error);
 
             return null;
         }
