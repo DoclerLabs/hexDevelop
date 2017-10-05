@@ -1,0 +1,13 @@
+-cp src
+-cp test
+-cp ../../../../../../hexMachina/hexIoC/test
+-cp ../../../../../../hexMachina/hexIoC/src
+-cp ../../../../../../hexMachina/hexCore/test
+-cp ../../../../../../hexMachina/hexCore/src
+-cp ../../../../../../hexMachina/hexService/src
+-cp ../../../../../../hexMachina/hexAnnotation/src
+-cp ../../../../../../hexMachina/hexInject/src
+-js bin/Main.js
+-main test.TestClass
+--macro util.ReferenceMacro.completePath('TestClass2')
+--times
