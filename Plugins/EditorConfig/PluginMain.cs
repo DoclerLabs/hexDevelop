@@ -205,7 +205,9 @@ namespace EditorConfig
             ApplyIndentation(sci1, config);
             ApplyIndentation(sci2, config);
 
-            ApplyMaxLineLength(config);
+            ApplyMaxLineLength(sci1, config);
+            ApplyMaxLineLength(sci2, config);
+
             ApplyTrimWhitespace(config);
             ApplyFinalNewLine(config);
 
@@ -240,11 +242,16 @@ namespace EditorConfig
 
         void ApplyIndentation(ScintillaControl sci, FileConfiguration config)
         {
-            Apply(() => config.IndentStyle, ref originalUseTabs, () => PluginBase.Settings.UseTabs, s => PluginBase.Settings.UseTabs = s,
-                () =>
+            Apply(() => config.IndentStyle, ref originalUseTabs, () => PluginBase.Settings.UseTabs,
+                s => //original
+                {
+                    PluginBase.Settings.UseTabs = s;
+                    sci.IsUseTabs = s;
+                },
+                s => //apply
                 {
                     //indent style
-                    switch (config.IndentStyle)
+                    switch (s)
                     {
                         case IndentStyle.Space:
                             PluginBase.Settings.UseTabs = false;
@@ -257,44 +264,50 @@ namespace EditorConfig
                     }
                 });
 
-            Apply(() => config.TabWidth, ref originalTabWidth, () => PluginBase.Settings.TabWidth, s => PluginBase.Settings.TabWidth = s,
-                () =>
+            Apply(() => config.TabWidth, ref originalTabWidth, () => PluginBase.Settings.TabWidth,
+                s =>
                 {
-                    //tab width
-                    PluginBase.Settings.TabWidth = (int) config.TabWidth;
-                    sci.TabWidth = (int) config.TabWidth;
+                    PluginBase.Settings.TabWidth = s;
+                    sci.TabWidth = s;
                 });
 
-            Apply(() => config.IndentSize?.NumberOfColumns, ref originalIndentSize, () => PluginBase.Settings.IndentSize, s => PluginBase.Settings.IndentSize = s,
-                () =>
+            Apply(() => config.IndentSize?.NumberOfColumns, ref originalIndentSize, () => PluginBase.Settings.IndentSize,
+                s =>
                 {
-                    //indent size
-                    PluginBase.Settings.IndentSize = (int) config.IndentSize?.NumberOfColumns;
-                    sci.Indent = (int) config.IndentSize?.NumberOfColumns;
+                    PluginBase.Settings.IndentSize = s;
+                    sci.Indent = s;
                 });
         }
 
-        void ApplyMaxLineLength(FileConfiguration config)
+        void ApplyMaxLineLength(ScintillaControl sci, FileConfiguration config)
         {
-            Apply(() => config.MaxLineLength, ref originalPrintMargin, () => PluginBase.Settings.PrintMarginColumn, s => PluginBase.Settings.PrintMarginColumn = s,
-                () => PluginBase.Settings.PrintMarginColumn = (int)config.MaxLineLength);
+            Apply(() => config.MaxLineLength, ref originalPrintMargin, () => PluginBase.Settings.PrintMarginColumn,
+                s =>
+                {
+                    sci.EdgeColumn = s;
+                    if (sci.EdgeColumn > 0) sci.EdgeMode = 1;
+                    else sci.EdgeMode = 0;
+
+                    PluginBase.Settings.PrintMarginColumn = s;
+                });
         }
 
         void ApplyFinalNewLine(FileConfiguration config)
         {
-            Apply(() => config.InsertFinalNewline, ref originalEnsureLastLine, () => PluginBase.Settings.EnsureLastLineEnd, s => PluginBase.Settings.EnsureLastLineEnd = s,
-                () => PluginBase.Settings.EnsureLastLineEnd = (bool)config.InsertFinalNewline);
+            Apply(() => config.InsertFinalNewline, ref originalEnsureLastLine, () => PluginBase.Settings.EnsureLastLineEnd,
+                s => PluginBase.Settings.EnsureLastLineEnd = s);
         }
 
         void ApplyEOL(ScintillaControl sci, FileConfiguration config)
         {
             if (sci == null || sci.IsReadOnly) return;
 
-            Apply(() => config.EndOfLine, ref originalEOLMode, () => PluginBase.Settings.EOLMode, s => PluginBase.Settings.EOLMode = s,
-                () =>
+            Apply(() => config.EndOfLine, ref originalEOLMode, () => PluginBase.Settings.EOLMode,
+                s => PluginBase.Settings.EOLMode = s, //original
+                s =>
                 {
                     ScintillaNet.Enums.EndOfLine mode = sci.EndOfLineMode;
-                    switch (config.EndOfLine)
+                    switch (s)
                     {
                         case EndOfLine.CR:
                             mode = ScintillaNet.Enums.EndOfLine.CR;
@@ -305,8 +318,6 @@ namespace EditorConfig
                         case EndOfLine.LF:
                             mode = ScintillaNet.Enums.EndOfLine.LF;
                             break;
-                        case null:
-                            return;
                     }
 
                     PluginBase.Settings.EOLMode = sci.EndOfLineMode = mode;
@@ -317,8 +328,7 @@ namespace EditorConfig
         void ApplyTrimWhitespace(FileConfiguration config)
         {
             Apply(() => config.TrimTrailingWhitespace, ref originalTrimWhitespace, () => PluginBase.Settings.StripTrailingSpaces,
-                s => PluginBase.Settings.StripTrailingSpaces = s,
-                () => PluginBase.Settings.StripTrailingSpaces = (bool) config.TrimTrailingWhitespace);
+                s => PluginBase.Settings.StripTrailingSpaces = s);
 
             PluginBase.Settings.StripTrailingSpaces = config.TrimTrailingWhitespace ?? PluginBase.Settings.StripTrailingSpaces;
         }
@@ -331,19 +341,30 @@ namespace EditorConfig
         /// <param name="getSetting">Getter function for PluginCore.Setting.YourSetting</param>
         /// <param name="applyOriginal">Applies the original settings if the document is not affected by .editorconfig</param>
         /// <param name="applierFunc">Applies the config option. Is only called if <code>getConfigOption() != null</code></param>
-        void Apply<S, T>(Func<S> getConfigOption, ref T? original, Func<T> getSetting, Action<T> applyOriginal, Action applierFunc) where T : struct
+        void Apply<S, T>(Func<S?> getConfigOption, ref T? original, Func<T> getSetting, Action<T> applyOriginal, Action<S> applierFunc) where T : struct where S : struct
         {
-            if (getConfigOption() != null) //document affected by .editorconfig
+            var opt = getConfigOption();
+            if (opt != null) //document affected by .editorconfig
             {
                 if (original == null) //we have no backup yet
                     original = getSetting(); //backup
 
-                applierFunc();
+                applierFunc((S) opt);
             }
             else if (original != null) //document not affected and we have saved settings from before
             {
                 applyOriginal((T) original); //restore
             }
+        }
+
+        /// <summary>
+        /// Helper method to make sure original settings are handled correctly.
+        /// This can be used if the original setting and the config option are of the same type.
+        /// It uses <see cref="Apply{S,T}"/> internally.
+        /// </summary>
+        void Apply<T>(Func<T?> getConfigOption, ref T? original, Func<T> getSetting, Action<T> applierFunc) where T : struct
+        {
+            Apply(getConfigOption, ref original, getSetting, applierFunc, applierFunc);
         }
 
         #endregion
