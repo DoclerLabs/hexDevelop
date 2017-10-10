@@ -1,0 +1,5 @@
+C:\Users\evasi\Documents\flashdevelop\FlowCompletion\bin\Debug\FlowCompletion.dll
+C:\Users\evasi\Documents\flashdevelop\FlowCompletion\bin\Debug\FlowCompletion.pdb
+C:\Users\evasi\Documents\flashdevelop\FlowCompletion\bin\Debug\PluginCore.dll
+C:\Users\evasi\Documents\flashdevelop\FlowCompletion\bin\Debug\PluginCore.pdb
+C:\Users\evasi\Documents\flashdevelop\FlashDevelop\Bin\Debug\Plugins\FlowCompletion.dll

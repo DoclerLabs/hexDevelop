@@ -366,7 +366,6 @@ namespace EditorConfig
         {
             Apply(getConfigOption, ref original, getSetting, applierFunc, applierFunc);
         }
-
         #endregion
 
     }
