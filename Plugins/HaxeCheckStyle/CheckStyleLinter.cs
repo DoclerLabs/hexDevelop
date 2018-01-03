@@ -27,7 +27,7 @@ namespace HaxeCheckStyle
             this.settings = settings;
         }
 
-        public void LintAsync(string[] files, LintCallback callback)
+        public void LintAsync(IEnumerable<string> files, LintCallback callback)
         {
             ProcessRunner p = new ProcessRunner();
             try
