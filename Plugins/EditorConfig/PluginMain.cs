@@ -127,7 +127,10 @@ namespace EditorConfig
                     break;
                 case EventType.FileSwitch:
                     if (PluginBase.CurrentProject != null && !PluginBase.MainForm.ClosingEntirely) //not loaded yet / unloading again
-                        ApplyConfig(PluginBase.MainForm.CurrentDocument);
+                        if (parser != null)
+                            ApplyConfig(PluginBase.MainForm.CurrentDocument);
+                        else    //recovery files may run into this case
+                            openingCache.Add(PluginBase.MainForm.CurrentDocument.FileName);
 
                     break;
                 case EventType.UIClosing:
